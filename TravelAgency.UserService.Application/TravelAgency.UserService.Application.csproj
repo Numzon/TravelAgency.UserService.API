@@ -11,14 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Authentication\Queries\" />
     <Folder Include="NotificationTemplates\Commands\" />
-    <Folder Include="NotificationTemplates\Handlers\" />
     <Folder Include="NotificationTemplates\Models\" />
     <Folder Include="NotificationTemplates\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.3.107.17" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.17" />
   </ItemGroup>

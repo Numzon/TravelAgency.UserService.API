@@ -1,18 +1,20 @@
-services:
-  #travelAgency.userService.webapi:
-  #  image: shop-backend-api:latest
-  #  build:
-  #    context: .
-  #    dockerfile: Shop.WebApi/Dockerfile
-  #  environment:
-  #    - ASPNETCORE_ENVIRONMENT=Development
-  #    - USER_SECRETS_ID=77fae489-2981-4c9b-98fd-269c51a25c6b
-  #  ports: 
-  #    - "8083:80"
-  #  volumes:
-  #    - $APPDATA/Microsoft/UserSecrets/77fae489-2981-4c9b-98fd-269c51a25c6b:/root/.microsoft/usersecrets/77fae489-2981-4c9b-98fd-269c51a25c6b
+version: '3.4'
 
-  mssql:
+services:
+  travelAgency.userService.webapi:
+    image: ${DOCKER_REGISTRY-}travelagencyuserserviceapi
+    build:
+      context: .
+      dockerfile: TravelAgeny.UserService.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - USER_SECRETS_ID=02b66918-a628-487b-991c-a1a4d2803ce9
+    ports: 
+      - "8083:80"
+    volumes:
+      - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
+
+  userServiceDb:
     container_name: travelAgency.userService.sqlServer
     image: mcr.microsoft.com/mssql/server:2022-latest
     restart: always
@@ -20,7 +22,7 @@ services:
         ACCEPT_EULA: "Y"
         SA_PASSWORD: "ergo.1234"
     ports:
-        - 1433:1433
+        - 8002:1433
     volumes:
         - sqlserver_data_container:/var/opt/mssql
 

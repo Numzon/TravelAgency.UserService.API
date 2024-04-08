@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.CreateNotificationType;
 using TravelAgency.UserService.Application.NotificationTypes.Queries.GetNotificationTypesQuery;

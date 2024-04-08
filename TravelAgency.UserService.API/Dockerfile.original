@@ -10,7 +10,6 @@ WORKDIR /src
 COPY ["TravelAgency.UserService.API/TravelAgency.UserService.API.csproj", "TravelAgency.UserService.API/"]
 COPY ["TravelAgency.UserService.Application/TravelAgency.UserService.Application.csproj", "TravelAgency.UserService.Application/"]
 COPY ["TravelAgency.UserService.Domain/TravelAgency.UserService.Domain.csproj", "TravelAgency.UserService.Domain/"]
-COPY ["TravelAgency.UserService.Infrastructure/TravelAgency.UserService.Infrastructure.csproj", "TravelAgency.UserService.Infrastructure/"]
 RUN dotnet restore "TravelAgency.UserService.API/TravelAgency.UserService.API.csproj"
 COPY . .
 WORKDIR "/src/TravelAgency.UserService.API"

@@ -3,12 +3,19 @@
 namespace TravelAgency.UserService.Application.Common.Errors;
 public sealed class NotFoundError : BaseError
 {
-    public int Id { get; init; }
-    public override string? Message => $"Element with Id: {Id} not found";
+    private readonly string? _stringId;
+    private readonly int? _intId;
+
+    public override string? Message => $"Element with Id: {_stringId ?? _intId?.ToString() ?? string.Empty} not found";
 
     public NotFoundError(int id)
     {
-        Id = id;
+        _intId = id;
+    }
+
+    public NotFoundError(string id)
+    {
+        _stringId = id;
     }
 
     public override IResult GetErrorResult()
