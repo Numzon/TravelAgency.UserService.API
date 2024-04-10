@@ -1,8 +1,8 @@
 using Serilog;
 using System.Reflection;
+using TravelAgency.CommonLibrary.Models;
 using TravelAgency.UserService.API;
 using TravelAgency.UserService.Application;
-using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddApplicationServices();
-await builder.Services.AddInfrastructureServices(builder);
+builder.Services.AddInfrastructureServices(builder);
 builder.Services.AddApiServices();
 
 builder.Host.UseSerilog();
