@@ -2,17 +2,17 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Domain.Common;
+using TravelAgency.UserService.Infrastructure.Extensions;
 
 namespace TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
 public sealed class BaseAuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
 {
-    //private readonly ICurrentUserService _currentUser;
+    private readonly ICurrentUserService _currentUser;
     private readonly IDateTimeService _dateTime;
 
-    public BaseAuditableEntitySaveChangesInterceptor(//ICurrentUserService currentUser, 
-        IDateTimeService dateTime)
+    public BaseAuditableEntitySaveChangesInterceptor(ICurrentUserService currentUser, IDateTimeService dateTime)
     {
-        //_currentUser = currentUser;
+        _currentUser = currentUser;
         _dateTime = dateTime;
     }
 
@@ -23,7 +23,7 @@ public sealed class BaseAuditableEntitySaveChangesInterceptor : SaveChangesInter
         return base.SavingChanges(eventData, result);
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)  
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
         UpdateBaseAudiableEntityProperties(eventData.Context!);
 
@@ -31,7 +31,7 @@ public sealed class BaseAuditableEntitySaveChangesInterceptor : SaveChangesInter
     }
 
     public void UpdateBaseAudiableEntityProperties(DbContext context)
-    { 
+    {
         if (context is null)
             return;
 
@@ -40,14 +40,14 @@ public sealed class BaseAuditableEntitySaveChangesInterceptor : SaveChangesInter
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.Created = _dateTime.Now;
-                //entry.Entity.CreatedBy = _currentUser.UserId;
+                entry.Entity.CreatedBy = _currentUser.Id;
             }
 
-            //if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
-            //{
-            //    entry.Entity.LastModified = _dateTime.Now;
-            //    entry.Entity.LastModifiedBy = _currentUser.UserId;
-            //}
+            if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.HasChangedOwnedEntities())
+            {
+                entry.Entity.LastModified = _dateTime.Now;
+                entry.Entity.LastModifiedBy = _currentUser.Id;
+            }
         }
     }
 }

@@ -4,7 +4,8 @@ using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Runtime;
 using AutoMapper;
 using Microsoft.Extensions.Options;
-using TravelAgency.CommonLibrary.Models;
+using TravelAgency.SharedLibrary.Enums;
+using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangeEmail;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangePassword;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangeUserAttributes;
@@ -22,13 +23,15 @@ using TravelAgency.UserService.Domain.Enums;
 namespace TravelAgency.UserService.Infrastructure.Services;
 public sealed class AmazonCognitoService : IAmazonCognitoService
 {
+    private readonly IAmazonCognitoIdentityProvider _client;
     private readonly AwsCognitoSettingsDto _settings;
     private readonly IMapper _mapper;
 
-    public AmazonCognitoService(IOptions<AwsCognitoSettingsDto> options, IMapper mapper)
+    public AmazonCognitoService(IAmazonCognitoIdentityProvider client, IOptions<AwsCognitoSettingsDto> options, IMapper mapper)
     {
         _settings = options.Value;
         _mapper = mapper;
+        _client = client;
     }
 
     public async Task<SignInResponseDto> SingInAsync(SignInCommand request, CancellationToken cancellationToken)
@@ -44,7 +47,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             ClientId = _settings.ClientId
         };
 
-        var initiateAuthResponse = await SendRequestAsync(c => c.InitiateAuthAsync(awsRequest, cancellationToken));
+        var initiateAuthResponse = await _client.InitiateAuthAsync(awsRequest, cancellationToken);
 
         AuthenticationResultType authResult = initiateAuthResponse.AuthenticationResult;
 
@@ -95,7 +98,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             Username = userId
         };
 
-        await SendRequestAsync(c => c.ForgotPasswordAsync(request, cancellationToken));
+        await _client.ForgotPasswordAsync(request, cancellationToken);
     }
 
     public async Task ChangePasswordAsync(ChangePasswordCommand request, CancellationToken cancellationToken)
@@ -107,7 +110,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             ProposedPassword = request.ProposedPassword
         };
 
-        await SendRequestAsync(c => c.ChangePasswordAsync(changePasswordRequest, cancellationToken));
+        await _client.ChangePasswordAsync(changePasswordRequest, cancellationToken);
     }
 
     public async Task CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken)
@@ -129,8 +132,8 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             UserPoolId = _settings.UserPoolId
         };
 
-        await SendRequestAsync(c => c.SignUpAsync(signUpRequest, cancellationToken));
-        await SendRequestAsync(c => c.AdminAddUserToGroupAsync(addUserToGroupRequest, cancellationToken));
+        await _client.SignUpAsync(signUpRequest, cancellationToken);
+        await _client.AdminAddUserToGroupAsync(addUserToGroupRequest, cancellationToken);
     }
 
     public async Task ConfirmUserCreationAsync(ConfirmUserCreationCommand command, CancellationToken cancellationToken)
@@ -142,7 +145,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             Username = command.Email
         };
 
-        await SendRequestAsync(c => c.ConfirmSignUpAsync(request, cancellationToken));
+        await _client.ConfirmSignUpAsync(request, cancellationToken);
     }
 
     public async Task DeleteUserAsync(string email, CancellationToken cancellationToken)
@@ -153,7 +156,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             UserPoolId = _settings.UserPoolId
         };
 
-        await SendRequestAsync(c => c.AdminDeleteUserAsync(request, cancellationToken));
+        await _client.AdminDeleteUserAsync(request, cancellationToken);
     }
 
     public async Task<RefreshTokenResponseDto> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken)
@@ -168,7 +171,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             ClientId = _settings.ClientId
         };
 
-        var initiateAuthResponse = await SendRequestAsync(c => c.InitiateAuthAsync(request, cancellationToken));
+        var initiateAuthResponse = await _client.InitiateAuthAsync(request, cancellationToken);
 
         AuthenticationResultType authResult = initiateAuthResponse.AuthenticationResult;
 
@@ -185,7 +188,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             Username = command.Email
         };
 
-        await SendRequestAsync(c => c.ConfirmForgotPasswordAsync(request, cancellationToken));
+        await _client.ConfirmForgotPasswordAsync(request, cancellationToken);
     }
 
     public async Task ChangeEmailAsync(ChangeEmailCommand command, CancellationToken cancellationToken)
@@ -199,7 +202,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             }
         };
 
-        await SendRequestAsync(c => c.UpdateUserAttributesAsync(request, cancellationToken));
+        await _client.UpdateUserAttributesAsync(request, cancellationToken);
     }
 
     public async Task ChangeUserAttributesAsync(ChangeUserAttributesCommand command, CancellationToken cancellationToken)
@@ -215,7 +218,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             }
         };
 
-        await SendRequestAsync(c => c.UpdateUserAttributesAsync(request, cancellationToken));
+        await _client.UpdateUserAttributesAsync(request, cancellationToken);
     }
 
     public async Task ConfrimChangeEmailAsync(ConfirmChangeEmailCommand command, CancellationToken cancellationToken)
@@ -227,7 +230,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             Code = command.ConfirmationCode
         };
 
-        await SendRequestAsync(c => c.VerifyUserAttributeAsync(request, cancellationToken));
+        await _client.VerifyUserAttributeAsync(request, cancellationToken);
     }
 
     private async Task<UserType?> GetUserAsync(string filter, CancellationToken cancellationToken, bool? isSimple = null)
@@ -252,7 +255,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             UserPoolId = _settings.UserPoolId
         };
 
-        var response = await SendRequestAsync(c => c.ListUsersAsync(request, cancellationToken));
+        var response = await _client.ListUsersAsync(request, cancellationToken);
 
         return response.Users.SingleOrDefault();
     }
@@ -273,16 +276,5 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             new() { Name = CognitoAttributes.GivenName, Value = command.GivenName },
             new() { Name = CognitoAttributes.FamilyName, Value = command.FamilyName }
         };
-    }
-
-    private async Task<T> SendRequestAsync<T>(Func<IAmazonCognitoIdentityProvider, Task<T>> request)
-       where T : AmazonWebServiceResponse
-    {
-        IAmazonCognitoIdentityProvider client = new AmazonCognitoIdentityProviderClient(
-            RegionEndpoint.GetBySystemName(_settings.Region));
-
-        T response = await request(client);
-
-        return response;
     }
 }
