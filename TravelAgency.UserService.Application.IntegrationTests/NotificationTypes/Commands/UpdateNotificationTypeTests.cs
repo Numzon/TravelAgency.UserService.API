@@ -1,30 +1,23 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using TravelAgency.UserService.API.IntegrationTests;
 using TravelAgency.UserService.Application.Common.Errors;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.UpdateNotificationType;
 using TravelAgency.UserService.Domain.Entities;
-using TravelAgency.UserService.Application.NotificationTypes.Commands.DeleteNotificationType;
 
 namespace TravelAgency.UserService.Application.IntegrationTests.NotificationTypes.Commands;
 
-using static BaseSqlServerDbTest<NotificationType>;
 
-public sealed class UpdateNotificationTypeTests //: BaseSqlServerDbTest<NotificationType>
+public sealed class UpdateNotificationTypeTests : BaseSqlServerDbTest<NotificationType>
 {
-    private readonly Fixture _fixture;
-
     public UpdateNotificationTypeTests() : base()
     {
-        _fixture = new Fixture();
     }
 
     [Fact]
     public async Task Handle_EntityDoesntExist_NotFoundError()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var command = _fixture.Create<UpdateNotificationTypeCommand>();
 
         //Act
@@ -42,15 +35,12 @@ public sealed class UpdateNotificationTypeTests //: BaseSqlServerDbTest<Notifica
         notFound!.Value.Should().NotBeNull();
         notFound!.StatusCode.Should().Be(StatusCodes.Status404NotFound);
         notFound!.Value!.Message.Should().NotBeNullOrEmpty();
-        await DisposeAsync();
     }
 
     [Fact]
     public async Task Handle_EntityExists_EntityUpdated()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var entity = _fixture.Build<NotificationType>().Without(x => x.NotificationTemplates).Without(x => x.Id).Create();
         var newName = _fixture.Create<string>();
 
@@ -80,15 +70,12 @@ public sealed class UpdateNotificationTypeTests //: BaseSqlServerDbTest<Notifica
         retrivedEntity.Should().NotBeNull();
         retrivedEntity!.Name.Should().NotBe(entity.Name);
         retrivedEntity!.Name.Should().Be(newName);
-        await DisposeAsync();
     }
 
     [Fact]
     public async Task Handle_SendedIdEqualsZero_ValidationError()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var command = _fixture.Build<UpdateNotificationTypeCommand>().With(x => x.Id, 0).Create();
 
         //Act
@@ -106,6 +93,5 @@ public sealed class UpdateNotificationTypeTests //: BaseSqlServerDbTest<Notifica
         validationError!.Value.Should().NotBeNull();
         validationError!.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         validationError!.Value!.Message.Should().NotBeNullOrEmpty();
-        await DisposeAsync();
     }
 }

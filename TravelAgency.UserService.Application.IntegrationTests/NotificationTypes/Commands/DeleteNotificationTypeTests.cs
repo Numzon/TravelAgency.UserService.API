@@ -1,23 +1,17 @@
-﻿using AutoFixture;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using TravelAgency.UserService.API.IntegrationTests;
 using TravelAgency.UserService.Application.Common.Errors;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.DeleteNotificationType;
-using TravelAgency.UserService.Application.NotificationTypes.Commands.UpdateNotificationType;
 using TravelAgency.UserService.Domain.Entities;
 
 namespace TravelAgency.UserService.Application.IntegrationTests.NotificationTypes.Commands;
 
-using static BaseSqlServerDbTest<NotificationType>;
 
-public sealed class DeleteNotificationTypeTests //: BaseSqlServerDbTest<NotificationType>
+public sealed class DeleteNotificationTypeTests : BaseSqlServerDbTest<NotificationType>
 {
-    private readonly Fixture _fixture;
-
     public DeleteNotificationTypeTests() : base()
     {
-        _fixture = new Fixture();
         _fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
             .ForEach(b => _fixture.Behaviors.Remove(b));
         _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
@@ -27,8 +21,6 @@ public sealed class DeleteNotificationTypeTests //: BaseSqlServerDbTest<Notifica
     public async Task Handle_EntityWithGivenIdDoestExist_NotFound()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var id = _fixture.Create<int>();
 
         //Act
@@ -46,7 +38,6 @@ public sealed class DeleteNotificationTypeTests //: BaseSqlServerDbTest<Notifica
         notFound!.Value.Should().NotBeNull();
         notFound!.StatusCode.Should().Be(StatusCodes.Status404NotFound);
         notFound!.Value!.Message.Should().NotBeNullOrEmpty();
-        await DisposeAsync();
     }
 
 
@@ -54,8 +45,6 @@ public sealed class DeleteNotificationTypeTests //: BaseSqlServerDbTest<Notifica
     public async Task Handle_EntityExists_EntityDeleted()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var entity = _fixture.Build<NotificationType>().Without(x => x.NotificationTemplates).Without(x => x.Id).Create();
 
         entity = await CreateAsync(entity);
@@ -82,15 +71,12 @@ public sealed class DeleteNotificationTypeTests //: BaseSqlServerDbTest<Notifica
         var retrivedEntity = await FirstOrDefaultAsync(x => x.Id == entity.Id);
 
         retrivedEntity.Should().BeNull();
-        await DisposeAsync();
     }
 
     [Fact]
     public async Task Handle_SendedIdEqualsZero_ValidationError()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var command = _fixture.Build<DeleteNotificationTypeCommand>().With(x => x.Id, 0).Create();
 
         //Act
@@ -108,6 +94,5 @@ public sealed class DeleteNotificationTypeTests //: BaseSqlServerDbTest<Notifica
         validationError!.Value.Should().NotBeNull();
         validationError!.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
         validationError!.Value!.Message.Should().NotBeNullOrEmpty();
-        await DisposeAsync();
     }
 }

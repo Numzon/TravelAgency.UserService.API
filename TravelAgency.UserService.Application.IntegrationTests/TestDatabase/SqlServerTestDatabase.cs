@@ -18,6 +18,7 @@ public sealed class SqlServerTestDatabase : ITestDatabase, IAsyncDisposable
 
     private readonly string _connectionString;
     private SqlConnection _connection = null!;
+    private UserServiceDbContext _context = null!;
     private Respawner _respawner = null!;
 
     public SqlServerTestDatabase()
@@ -28,13 +29,19 @@ public sealed class SqlServerTestDatabase : ITestDatabase, IAsyncDisposable
           .AddEnvironmentVariables()
           .Build();
 
-        var connectionString = configuration.GetConnectionString(DatabaseName);
+        var connectionStringBase = configuration.GetConnectionString(DatabaseName);
+
+        var connectionString = string.Concat(connectionStringBase, "Initial Catalog=", Guid.NewGuid().ToString(), ";");
 
         _connectionString = connectionString ?? throw new NullException("ConnectionString is null");
     }
 
     public async ValueTask DisposeAsync()
     {
+        if (_context is not null)
+        {
+            await _context.Database.EnsureDeletedAsync();
+        }
         await _connection.DisposeAsync();
     }
 
@@ -55,13 +62,13 @@ public sealed class SqlServerTestDatabase : ITestDatabase, IAsyncDisposable
 
         var interceptor = new BaseAuditableEntitySaveChangesInterceptor(currentUserService, dateTimeService);
 
-        var context = new UserServiceDbContext(options, mediatr, interceptor);
+        _context = new UserServiceDbContext(options, mediatr, interceptor);
 
-        context.Database.Migrate();
+        _context.Database.Migrate();
 
         _respawner = await Respawner.CreateAsync(_connectionString, new RespawnerOptions
         {
-            TablesToIgnore = new Respawn.Graph.Table[] { "__EFMigrationsHistory" }
+            TablesToIgnore = new Respawn.Graph.Table[] { "__EFMigrationsHistory" },
         });
     }
 
@@ -69,7 +76,6 @@ public sealed class SqlServerTestDatabase : ITestDatabase, IAsyncDisposable
     {
         await _respawner.ResetAsync(_connectionString);
     }
-
 
     private string GetAppsettingsTestsPath()
     {

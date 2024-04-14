@@ -9,12 +9,12 @@ using TravelAgency.UserService.Infrastructure.Persistance;
 
 namespace TravelAgency.UserService.API.IntegrationTests;
 
-public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
+public class BaseSqlServerDbTest<TEntity> : IAsyncLifetime
     where TEntity : BaseEntity
 {
-    private static ITestDatabase _database = default!;
-    private static CustomWebApplicationFactory _factory = default!;
-    private static IServiceScopeFactory _scopeFactory = default!;
+    private ITestDatabase _database = default!;
+    private CustomWebApplicationFactory _factory = default!;
+    private IServiceScopeFactory _scopeFactory = default!;
 
     protected readonly Fixture _fixture;
 
@@ -23,7 +23,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         _fixture = new Fixture();
     }
 
-    public async static Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
+    public async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -32,7 +32,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         return await mediator.Send(request);
     }
 
-    public async static Task SendAsync(IBaseRequest request)
+    public async Task SendAsync(IBaseRequest request)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -41,12 +41,12 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         await mediator.Send(request);
     }
 
-    public async static Task ResetState()
+    public async Task ResetState()
     {
         await _database.ResetAsync();
     }
 
-    public async static Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -55,7 +55,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         return await context.Set<TEntity>().FirstOrDefaultAsync(predicate);
     }
 
-    public async static Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>>? predicate = null)
+    public async Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -69,7 +69,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         return await context.Set<TEntity>().ToListAsync();
     }
 
-    public async static Task<TEntity> CreateAsync(TEntity entity)
+    public async Task<TEntity> CreateAsync(TEntity entity)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -81,7 +81,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         return entity;
     }
 
-    public async static Task<IEnumerable<TEntity>> CreateRangeAsync(IEnumerable<TEntity> entities)
+    public async Task<IEnumerable<TEntity>> CreateRangeAsync(IEnumerable<TEntity> entities)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -93,7 +93,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         return entities;
     }
 
-    public async static Task<int> CountAsync()
+    public async Task<int> CountAsync()
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -102,7 +102,7 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         return await context.Set<TEntity>().CountAsync();
     }
 
-    public async static Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         _database = await TestDatabaseFactory.CreateAsync();
 
@@ -113,9 +113,10 @@ public class BaseSqlServerDbTest<TEntity> //: IAsyncLifetime
         await _database.ResetAsync();
     }
 
-    public static async Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         await _database.DisposeAsync();
         await _factory.DisposeAsync();
+
     }
 }

@@ -7,26 +7,21 @@ using TravelAgency.UserService.Domain.Entities;
 using TravelAgency.UserService.SharedTestLibrary.Helpers;
 
 namespace TravelAgency.UserService.Application.IntegrationTests.NotificationTypes.Queries;
-using static BaseSqlServerDbTest<NotificationType>;
-public class GetNotificationTypesTests //: BaseSqlServerDbTest<NotificationType>
-{
-    private readonly Fixture _fixture;
 
+public class GetNotificationTypesTests : BaseSqlServerDbTest<NotificationType>
+{
     public GetNotificationTypesTests() : base()
     {
-        _fixture = new Fixture();
     }
 
     [Fact]
     public async Task Handle_SearchStringIsEmpty_AllPossibleEntities()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var entities = _fixture.Build<NotificationType>().Without(x => x.NotificationTemplates).Without(x => x.Id).CreateMany(RandomHelper.Next(5,10));
 
         entities = await CreateRangeAsync(entities);
-        var count = entities.Count();
+        var count = await CountAsync();
 
         //Act
         var response = await SendAsync(new GetNotificationTypesQuery());
@@ -47,15 +42,12 @@ public class GetNotificationTypesTests //: BaseSqlServerDbTest<NotificationType>
         retrivedEntity.Should().NotBeNull();
         retrivedEntity.Should().HaveCount(count);
         retrivedEntity!.All(x => entities.Any(z => z.Id == x.Id && z.Name == x.Name)).Should().BeTrue(); 
-        await DisposeAsync();
     }
 
     [Fact]
     public async Task Handle_SearchStringDoesntMatchAnyEntity_EmptyArray()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var entities = _fixture.Build<NotificationType>().Without(x => x.NotificationTemplates).Without(x => x.Id).CreateMany(RandomHelper.Next(5, 10));
         var count = entities.Count();
 
@@ -81,15 +73,12 @@ public class GetNotificationTypesTests //: BaseSqlServerDbTest<NotificationType>
         retrivedEntity.Should().NotBeNull();
         retrivedEntity.Should().HaveCountLessThan(count);
         retrivedEntity.Should().BeEmpty();
-        await DisposeAsync();
     }
 
     [Fact]
     public async Task Handle_SearchStringMatchesSomeEntities_AllEntitiesThanMatchSearchString()
     {
         //Arrange
-        await InitializeAsync();
-        await ResetState();
         var searchString = "Dummy";
 
         var entities = _fixture.Build<NotificationType>().Without(x => x.NotificationTemplates).Without(x => x.Id).CreateMany(RandomHelper.Next(5, 10)).ToList();
@@ -122,6 +111,5 @@ public class GetNotificationTypesTests //: BaseSqlServerDbTest<NotificationType>
         retrivedEntity.Should().NotBeNull();
         retrivedEntity.Should().HaveCount(matchingEntities.Count);
         retrivedEntity!.All(x => matchingEntities.Any(z => z.Id == x.Id && z.Name == x.Name)).Should().BeTrue();
-        await DisposeAsync();
     }
 }
