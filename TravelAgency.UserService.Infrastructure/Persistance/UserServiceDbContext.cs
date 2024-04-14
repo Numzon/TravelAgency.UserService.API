@@ -19,8 +19,6 @@ public class UserServiceDbContext : DbContext, IUserServiceDbContext
         IMediator mediator,
         BaseAuditableEntitySaveChangesInterceptor baseAuditableEntitySaveChangesInterceptor) : base(options)
     {
-        _mediator = mediator;
-        _baseAuditableEntitySaveChangesInterceptor = baseAuditableEntitySaveChangesInterceptor;
         _baseAuditableEntitySaveChangesInterceptor = baseAuditableEntitySaveChangesInterceptor;
         _mediator = mediator;
     }

@@ -1,10 +1,13 @@
 ﻿using Amazon;
+using Amazon.CognitoIdentityProvider;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TravelAgency.CommonLibrary.AWS;
-using TravelAgency.CommonLibrary.Models;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using TravelAgency.SharedLibrary.AWS;
+using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
@@ -34,6 +37,7 @@ public static class ConfigureServices
         services.AddScoped<UserServiceDbContextInitialiser>();
         services.AddScoped<IUserServiceDbContext, UserServiceDbContext>();
         services.AddScoped<BaseAuditableEntitySaveChangesInterceptor>();
+        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
         services.RegisterRepositories();
         services.RegisterServices();
@@ -42,8 +46,11 @@ public static class ConfigureServices
 
         var cognitoConfiguration = builder.Configuration.GetRequiredSection("AWS:Cognito").Get<AwsCognitoSettingsDto>()!;
 
+        var amazonClient = new AmazonCognitoIdentityProviderClient(RegionEndpoint.GetBySystemName(cognitoConfiguration.Region));
+
+        services.AddSingleton<IAmazonCognitoIdentityProvider>(amazonClient);
         services.AddAuthenticationAndJwtConfiguration(cognitoConfiguration);
-        services.AddAuthorizationWithPolicies();
+        services.AddAuthorizationWithPolicies(); 
 
         return services;
     }
@@ -58,7 +65,8 @@ public static class ConfigureServices
     private static IServiceCollection RegisterServices(this IServiceCollection services)
     {
         services.AddScoped<IDateTimeService, DateTimeService>();
-        services.AddScoped<IAmazonCognitoService, AmazonCognitoService>();  
+        services.AddScoped<IAmazonCognitoService, AmazonCognitoService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         return services;
     }
