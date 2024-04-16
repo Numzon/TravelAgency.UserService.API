@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using TravelAgency.SharedLibrary.AWS;
 using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Common.Interfaces;
+using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
 using TravelAgency.UserService.Infrastructure.Repositories;
@@ -43,6 +44,7 @@ public static class ConfigureServices
         services.RegisterServices();
 
         services.Configure<AwsCognitoSettingsDto>(builder.Configuration.GetRequiredSection("AWS:Cognito"));
+        //services.Configure<AmazonSimpleEmailServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleEmailService"));
 
         var cognitoConfiguration = builder.Configuration.GetRequiredSection("AWS:Cognito").Get<AwsCognitoSettingsDto>()!;
 
@@ -58,6 +60,7 @@ public static class ConfigureServices
     private static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
+        //services.AddScoped<IClientAccountRepository, ClientAccountRepository>();    
 
         return services;
     }
@@ -67,6 +70,7 @@ public static class ConfigureServices
         services.AddScoped<IDateTimeService, DateTimeService>();
         services.AddScoped<IAmazonCognitoService, AmazonCognitoService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+       // services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailService>();
 
         return services;
     }

@@ -43,7 +43,8 @@ public abstract class BaseInMemoryDbTest : IAsyncLifetime
             .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
             .Options;
 
-        var audiableInterceptor = new BaseAuditableEntitySaveChangesInterceptor(currentUser.Object, dateService.Object);
+        var audiableInterceptor = new BaseAuditableEntitySaveChangesInterceptor(currentUser.Object,
+            dateService.Object);
 
         return new UserServiceDbContext(dbContextOptions, mediator.Object, audiableInterceptor);
     }

@@ -60,7 +60,8 @@ public sealed class SqlServerTestDatabase : ITestDatabase, IAsyncDisposable
         var mediatr = Mock.Of<IMediator>();
         var currentUserService = Mock.Of<ICurrentUserService>();
 
-        var interceptor = new BaseAuditableEntitySaveChangesInterceptor(currentUserService, dateTimeService);
+        var interceptor = new BaseAuditableEntitySaveChangesInterceptor(currentUserService, 
+            dateTimeService);
 
         _context = new UserServiceDbContext(options, mediatr, interceptor);
 

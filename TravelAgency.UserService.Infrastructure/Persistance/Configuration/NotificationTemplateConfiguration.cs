@@ -7,6 +7,14 @@ public class NotificationTemplateConfiguration : IEntityTypeConfiguration<Notifi
 {
     public void Configure(EntityTypeBuilder<NotificationTemplate> builder)
     {
+        builder.HasKey(t => t.Id);
+
+        builder.Property(x => x.Name)
+            .IsRequired();
+
+        builder.Property(x => x.Description)
+            .IsRequired();
+
         builder
             .HasOne(x => x.NotificationType)
             .WithMany(x => x.NotificationTemplates)
