@@ -1,0 +1,8 @@
+{
+  "Template": {
+    "TemplateName": "WelcomeMailTemplate",
+    "SubjectPart": "Welcome to Voyago!",
+    "TextPart": "Hello {{userEmail}}! We are happy that you joined! Lorem Ipsum.",
+    "HtmlPart": "<html>\n<body>\n<h2>Hello {{userEmail}}!</h2>\n<p>We are happy that you joined! Lorem Ipsum.</p></body>\n</html>"
+  }
+}

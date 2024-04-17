@@ -14,6 +14,8 @@ public class UserServiceDbContext : DbContext, IUserServiceDbContext
 
     public DbSet<NotificationTemplate> NotificationTemplate { get; set; }
     public DbSet<NotificationType> NotificationTypes { get; set; }
+    public DbSet<ClientAccount> ClientAccount { get; set; }
+    public DbSet<CreditCard> CreditCard { get; set; }
 
     public UserServiceDbContext(DbContextOptions<UserServiceDbContext> options,
         IMediator mediator,
