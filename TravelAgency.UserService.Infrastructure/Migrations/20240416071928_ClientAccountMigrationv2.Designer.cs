@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TravelAgency.UserService.Infrastructure.Persistance;
 
@@ -11,9 +12,11 @@ using TravelAgency.UserService.Infrastructure.Persistance;
 namespace TravelAgency.UserService.Infrastructure.Migrations
 {
     [DbContext(typeof(UserServiceDbContext))]
-    partial class UserServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240416071928_ClientAccountMigrationv2")]
+    partial class ClientAccountMigrationv2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,7 +58,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[CreditCardId] IS NOT NULL");
 
-                    b.ToTable("ClientAccount", (string)null);
+                    b.ToTable("ClientAccount");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.CreditCard", b =>
@@ -91,7 +94,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditCard", (string)null);
+                    b.ToTable("CreditCard");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.NotificationTemplate", b =>
@@ -129,7 +132,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
 
                     b.HasIndex("NotificationTypeId");
 
-                    b.ToTable("NotificationTemplate", (string)null);
+                    b.ToTable("NotificationTemplate");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.NotificationType", b =>
@@ -158,7 +161,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NotificationTypes", (string)null);
+                    b.ToTable("NotificationTypes");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.ClientAccount", b =>

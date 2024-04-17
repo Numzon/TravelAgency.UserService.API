@@ -37,6 +37,8 @@ public class Program
         {
             builder.Services.AddAndConfigureSwagger(assembly.GetName().Name!,
                     cognitoConfiguration.AuthorityDiscoveryUrl);
+
+            builder.Configuration.AddUserSecrets(assembly);
         }
 
         var app = builder.Build();

@@ -1,15 +1,18 @@
 ﻿using Amazon;
 using Amazon.CognitoIdentityProvider;
+using LinqKit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using Serilog;
+using System.Data.Common;
 using TravelAgency.SharedLibrary.AWS;
 using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Common.Interfaces;
-using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
 using TravelAgency.UserService.Infrastructure.Repositories;
@@ -31,6 +34,10 @@ public static class ConfigureServices
         builder.Configuration.AddAndConfigureSecretManager(builder.Environment, RegionEndpoint.EUNorth1, dockerNamingConvention);
 
         var connectionString = builder.Configuration.GetConnectionString("UserServiceDatabase");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            connectionString = builder.BuildConnectionStringFromUserSecrets();
+        }
 
         services.AddDbContext<UserServiceDbContext>(options =>
                 options.UseSqlServer(connectionString, builder => builder.MigrationsAssembly(typeof(UserServiceDbContext).Assembly.FullName)));
@@ -51,8 +58,20 @@ public static class ConfigureServices
         var amazonClient = new AmazonCognitoIdentityProviderClient(RegionEndpoint.GetBySystemName(cognitoConfiguration.Region));
 
         services.AddSingleton<IAmazonCognitoIdentityProvider>(amazonClient);
-        services.AddAuthenticationAndJwtConfiguration(cognitoConfiguration);
-        services.AddAuthorizationWithPolicies(); 
+
+        try
+        {
+            services.AddAuthenticationAndJwtConfiguration(cognitoConfiguration);
+        }
+        catch (Exception ex)
+        {
+            if (!builder.Environment.IsDevelopment())
+            {
+                Log.Error(ex.Message);
+            }
+        }
+
+        services.AddAuthorizationWithPolicies();
 
         return services;
     }
@@ -60,7 +79,7 @@ public static class ConfigureServices
     private static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddScoped<INotificationTypeRepository, NotificationTypeRepository>();
-        //services.AddScoped<IClientAccountRepository, ClientAccountRepository>();    
+        services.AddScoped<IClientAccountRepository, ClientAccountRepository>();
 
         return services;
     }
@@ -70,8 +89,21 @@ public static class ConfigureServices
         services.AddScoped<IDateTimeService, DateTimeService>();
         services.AddScoped<IAmazonCognitoService, AmazonCognitoService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-       // services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailService>();
+        services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailService>();
 
         return services;
+    }
+
+    private static string BuildConnectionStringFromUserSecrets(this WebApplicationBuilder builder)
+    {
+        var connectionStringBuilder = new DbConnectionStringBuilder();
+
+        builder.Configuration
+             .GetRequiredSection("Database")
+             .GetChildren()
+             .Where(x => !string.IsNullOrWhiteSpace(x.Value))
+             .ForEach(x => connectionStringBuilder.Add(x.Key, x.Value!));
+
+        return connectionStringBuilder.ToString();
     }
 }
