@@ -27,4 +27,5 @@ public interface IAmazonCognitoService
     Task ChangeEmailAsync(ChangeEmailCommand command, CancellationToken cancellationToken);
     Task ConfrimChangeEmailAsync(ConfirmChangeEmailCommand command, CancellationToken cancellationToken);
     Task ChangeUserAttributesAsync(ChangeUserAttributesCommand command, CancellationToken cancellationToken);
+    Task<IEnumerable<string>> GetUserGroupsAsync(string userId, CancellationToken cancellationToken); 
 }

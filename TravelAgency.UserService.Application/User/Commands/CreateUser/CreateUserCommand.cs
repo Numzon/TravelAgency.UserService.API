@@ -10,13 +10,11 @@ public sealed record CreateUserCommand(string Email, string? GivenName, string? 
 public sealed class CreateUserCommandHandler : IResultRequestHandler<CreateUserCommand>
 {
     private readonly IAmazonCognitoService _amazonService;
-    private readonly IAmazonSimpleEmailService _emailService;
     private readonly IPublisher _publisher;
 
-    public CreateUserCommandHandler(IAmazonCognitoService amazonService, IAmazonSimpleEmailService emailService, IPublisher publisher)
+    public CreateUserCommandHandler(IAmazonCognitoService amazonService, IPublisher publisher)
     {
         _amazonService = amazonService;
-        _emailService = emailService;
         _publisher = publisher;
     }
 
@@ -40,8 +38,6 @@ public sealed class CreateUserCommandHandler : IResultRequestHandler<CreateUserC
             {
                 //await _publisher.Publish(new ClientUserCreatedEvent(user.Id));TravelAgency :P
             }
-
-            await _emailService.SendWelcomeEmailAsync(user.Email, cancellationToken);
 
             return CustomResults.CreateAtRoute("GetAsync", new {  id = user.Id }, user);
         }

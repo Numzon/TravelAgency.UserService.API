@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System.Security.Authentication;
+using System.Security.Claims;
 using TravelAgency.SharedLibrary.Enums;
 using TravelAgency.UserService.Application.Common.Interfaces;
 
@@ -16,7 +17,7 @@ public sealed class CurrentUserService : ICurrentUserService
         _id = context.HttpContext?.User.Claims.SingleOrDefault(x => x.Type == AwsTokenNames.Username)?.Value;
     }
 
-    public string AccessToken => _accessToken ?? throw new AuthenticationException("Invalid user access token");
+    public string? AccessToken => _accessToken;
 
-    public string Id => _id ?? throw new AuthenticationException("Invalid user id");
+    public string? Id => _id;
 }

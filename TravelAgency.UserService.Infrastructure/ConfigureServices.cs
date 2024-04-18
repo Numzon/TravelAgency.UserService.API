@@ -1,5 +1,6 @@
 ﻿using Amazon;
 using Amazon.CognitoIdentityProvider;
+using Amazon.SimpleEmailV2;
 using LinqKit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,7 @@ using System.Data.Common;
 using TravelAgency.SharedLibrary.AWS;
 using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Common.Interfaces;
+using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
 using TravelAgency.UserService.Infrastructure.Repositories;
@@ -51,14 +53,14 @@ public static class ConfigureServices
         services.RegisterServices();
 
         services.Configure<AwsCognitoSettingsDto>(builder.Configuration.GetRequiredSection("AWS:Cognito"));
-        //services.Configure<AmazonSimpleEmailServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleEmailService"));
+        services.Configure<AmazonEmailServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleEmailService"));
+        services.Configure<AmazonNotificationServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleNotificationService"));
 
         var cognitoConfiguration = builder.Configuration.GetRequiredSection("AWS:Cognito").Get<AwsCognitoSettingsDto>()!;
 
-        var amazonClient = new AmazonCognitoIdentityProviderClient(RegionEndpoint.GetBySystemName(cognitoConfiguration.Region));
-
-        services.AddSingleton<IAmazonCognitoIdentityProvider>(amazonClient);
-
+        var cognitoClient = new AmazonCognitoIdentityProviderClient(RegionEndpoint.GetBySystemName(cognitoConfiguration.Region));
+        services.AddSingleton<IAmazonCognitoIdentityProvider>(cognitoClient);
+            
         try
         {
             services.AddAuthenticationAndJwtConfiguration(cognitoConfiguration);
@@ -89,7 +91,8 @@ public static class ConfigureServices
         services.AddScoped<IDateTimeService, DateTimeService>();
         services.AddScoped<IAmazonCognitoService, AmazonCognitoService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IAmazonSimpleEmailService, AmazonSimpleEmailService>();
+        services.AddScoped<IAmazonEmailService, AmazonEmailService>();
+        services.AddScoped<IAmazonNotificationService, AmazonNotificationService>();    
 
         return services;
     }

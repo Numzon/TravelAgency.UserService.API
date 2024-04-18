@@ -10,3 +10,4 @@ public sealed class TravelAgencyUserCreatedEventHandler : INotificationHandler<T
         Log.Information("Travel Agency for user");
     }
 }
+    

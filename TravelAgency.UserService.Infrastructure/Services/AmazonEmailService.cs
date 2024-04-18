@@ -3,19 +3,21 @@ using Amazon.SimpleEmailV2;
 using Amazon.SimpleEmailV2.Model;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Threading;
+using Serilog;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Domain.Enums;
 
 namespace TravelAgency.UserService.Infrastructure.Services;
-public sealed class AmazonSimpleEmailService : IAmazonSimpleEmailService
+public sealed class AmazonEmailService : IAmazonEmailService
 {
-    private readonly AmazonSimpleEmailServiceSettingsDto _settings;
+    private readonly AmazonEmailServiceSettingsDto _settings;
+    private readonly IAmazonSimpleEmailServiceV2 _client;
 
-    public AmazonSimpleEmailService(IOptions<AmazonSimpleEmailServiceSettingsDto> options)
+    public AmazonEmailService(IOptions<AmazonEmailServiceSettingsDto> options)
     {
         _settings = options.Value;
+        _client = new AmazonSimpleEmailServiceV2Client(RegionEndpoint.GetBySystemName(_settings.Region));
     }
 
     public async Task SendWelcomeEmailAsync(string email, CancellationToken cancellationToken)
@@ -39,13 +41,11 @@ public sealed class AmazonSimpleEmailService : IAmazonSimpleEmailService
 
     private async Task SendEmailAsync(Template template, List<string> toAddresses, CancellationToken cancellationToken)
     {
-        var client = new AmazonSimpleEmailServiceV2Client(RegionEndpoint.GetBySystemName(_settings.Region));
-
         var request = new SendEmailRequest
         {
             Content = new EmailContent
             {
-                Template = template
+                Template = template,
             },
             FromEmailAddress = _settings.SourceEmailAddress,
             Destination = new Destination
@@ -54,6 +54,6 @@ public sealed class AmazonSimpleEmailService : IAmazonSimpleEmailService
             }
         };
 
-        await client.SendEmailAsync(request, cancellationToken);
+        await _client.SendEmailAsync(request, cancellationToken);
     }
 }

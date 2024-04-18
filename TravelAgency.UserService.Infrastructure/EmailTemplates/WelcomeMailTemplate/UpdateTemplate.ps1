@@ -1,1 +1,1 @@
-aws ses update-template --cli-input-json file://WelcomeMailTemplate.json
+aws ses update-template --cli-input-json file://WelcomeEmailTemplate.json

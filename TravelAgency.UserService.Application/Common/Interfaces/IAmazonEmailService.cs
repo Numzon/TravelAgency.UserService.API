@@ -1,5 +1,5 @@
 ﻿namespace TravelAgency.UserService.Application.Common.Interfaces;
-public interface IAmazonSimpleEmailService
+public interface IAmazonEmailService
 {
     Task SendWelcomeEmailAsync(string email, CancellationToken cancellationToken);
 }

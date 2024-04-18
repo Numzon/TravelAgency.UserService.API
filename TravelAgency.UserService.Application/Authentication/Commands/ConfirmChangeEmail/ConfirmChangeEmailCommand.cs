@@ -7,18 +7,18 @@ public sealed record ConfirmChangeEmailCommand(string AccessToken, string Confir
 
 public sealed class ConfirmChangeEmailCommandHandler : IResultRequestHandler<ConfirmChangeEmailCommand>
 {
-    private readonly IAmazonCognitoService _amazonService;
+    private readonly IAmazonCognitoService _cognitoService;
 
-    public ConfirmChangeEmailCommandHandler(IAmazonCognitoService amazonService)
+    public ConfirmChangeEmailCommandHandler(IAmazonCognitoService cognitoService)
     {
-        _amazonService = amazonService;
+        _cognitoService = cognitoService;
     }
 
     public async Task<CustomResult> Handle(ConfirmChangeEmailCommand request, CancellationToken cancellationToken)
     {
         try
         {
-            await _amazonService.ConfrimChangeEmailAsync(request, cancellationToken);
+            await _cognitoService.ConfrimChangeEmailAsync(request, cancellationToken);
             return CustomResults.NoContent();
         }
         catch (Exception ex)

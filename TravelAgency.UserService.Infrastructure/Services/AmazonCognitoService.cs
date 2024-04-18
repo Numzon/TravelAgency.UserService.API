@@ -4,6 +4,7 @@ using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Runtime;
 using AutoMapper;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using TravelAgency.SharedLibrary.Enums;
 using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangeEmail;
@@ -231,6 +232,24 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         };
 
         await _client.VerifyUserAttributeAsync(request, cancellationToken);
+    }
+
+    public async Task<IEnumerable<string>> GetUserGroupsAsync(string userId, CancellationToken cancellationToken)
+    {
+        var request = new AdminListGroupsForUserRequest
+        {
+            Username = userId,
+            UserPoolId = _settings.UserPoolId
+        };
+
+        var response = await _client.AdminListGroupsForUserAsync(request);
+
+        if (response.Groups.IsNullOrEmpty())
+        {
+            return Enumerable.Empty<string>();  
+        }
+
+        return response.Groups.Select(x => x.GroupName);
     }
 
     private async Task<UserType?> GetUserAsync(string filter, CancellationToken cancellationToken, bool? isSimple = null)
