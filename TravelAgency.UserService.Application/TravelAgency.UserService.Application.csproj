@@ -27,7 +27,7 @@
     <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.3.107.17" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.18" />
-    <PackageReference Include="TravelAgency.SharedLibrary" Version="1.0.2" />
+    <PackageReference Include="TravelAgency.SharedLibrary" Version="1.0.3" />
   </ItemGroup>
 
 </Project>
