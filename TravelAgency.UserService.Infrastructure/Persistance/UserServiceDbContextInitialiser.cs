@@ -1,17 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace TravelAgency.UserService.Infrastructure.Persistance;
 public class UserServiceDbContextInitialiser
 {
     private readonly UserServiceDbContext _userServiceDbContext;
-    private readonly IConfiguration _configuration;
 
-    public UserServiceDbContextInitialiser(UserServiceDbContext userServiceDbContext, IConfiguration configuration)
+    public UserServiceDbContextInitialiser(UserServiceDbContext userServiceDbContext)
     {
         _userServiceDbContext = userServiceDbContext;
-        _configuration = configuration;
     }
 
     public async Task InitialiseAsync()

@@ -1,6 +1,7 @@
 using Serilog;
 using System.Reflection;
 using TravelAgency.SharedLibrary.Models;
+using TravelAgency.SharedLibrary.Swagger;
 using TravelAgency.UserService.Application;
 using TravelAgency.UserService.Infrastructure;
 
@@ -29,14 +30,9 @@ public class Program
 
         Assembly assembly = typeof(Program).Assembly;
 
-        var cognitoConfiguration = builder.Configuration
-            .GetRequiredSection("AWS:Cognito")
-            .Get<AwsCognitoSettingsDto>()!;
-
         if (builder.Environment.IsDevelopment())
         {
-            builder.Services.AddAndConfigureSwagger(assembly.GetName().Name!,
-                    cognitoConfiguration.AuthorityDiscoveryUrl);
+            builder.Services.AddAndConfigureSwagger(assembly.GetName().Name!);
 
             builder.Configuration.AddUserSecrets(assembly);
         }

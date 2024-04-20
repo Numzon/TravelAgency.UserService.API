@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using System.Security.Authentication;
-using System.Security.Claims;
 using TravelAgency.SharedLibrary.Enums;
 using TravelAgency.UserService.Application.Common.Interfaces;
 

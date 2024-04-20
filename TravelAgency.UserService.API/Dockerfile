@@ -7,6 +7,7 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
+COPY ["nuget.config", ""]
 COPY ["TravelAgency.UserService.API/TravelAgency.UserService.API.csproj", "TravelAgency.UserService.API/"]
 COPY ["TravelAgency.UserService.Application/TravelAgency.UserService.Application.csproj", "TravelAgency.UserService.Application/"]
 COPY ["TravelAgency.UserService.Domain/TravelAgency.UserService.Domain.csproj", "TravelAgency.UserService.Domain/"]
