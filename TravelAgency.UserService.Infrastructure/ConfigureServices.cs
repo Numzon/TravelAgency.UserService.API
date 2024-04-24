@@ -17,6 +17,7 @@ using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
+using TravelAgency.UserService.Infrastructure.Publishers;
 using TravelAgency.UserService.Infrastructure.Repositories;
 using TravelAgency.UserService.Infrastructure.Services;
 
@@ -26,17 +27,11 @@ public static class ConfigureServices
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, WebApplicationBuilder builder)
     {
         var awsEnv = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
-        string dockerNamingConvention = string.Empty;
 
-        if (awsEnv is not null)
-        {
-            dockerNamingConvention = "Docker_";
-        }
-
-        builder.Configuration.AddAndConfigureSecretManager(builder.Environment, RegionEndpoint.EUNorth1, dockerNamingConvention);
+        builder.Configuration.AddAndConfigureSecretManager(builder.Environment, RegionEndpoint.EUNorth1);
 
         var connectionString = builder.Configuration.GetConnectionString("UserServiceDatabase");
-        if (string.IsNullOrEmpty(connectionString))
+        if (string.IsNullOrEmpty(connectionString) || awsEnv is null)
         {
             connectionString = builder.BuildConnectionStringFromUserSecrets();
         }
@@ -55,6 +50,7 @@ public static class ConfigureServices
         services.Configure<AwsCognitoSettingsDto>(builder.Configuration.GetRequiredSection("AWS:Cognito"));
         services.Configure<AmazonEmailServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleEmailService"));
         services.Configure<AmazonNotificationServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleNotificationService"));
+        services.Configure<RabbitMqSettingsDto>(builder.Configuration.GetRequiredSection("RabbitMQ"));
 
         var cognitoConfiguration = builder.Configuration.GetRequiredSection("AWS:Cognito").Get<AwsCognitoSettingsDto>()!;
 
@@ -92,7 +88,8 @@ public static class ConfigureServices
         services.AddScoped<IAmazonCognitoService, AmazonCognitoService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IAmazonEmailService, AmazonEmailService>();
-        services.AddScoped<IAmazonNotificationService, AmazonNotificationService>();    
+        services.AddScoped<IAmazonNotificationService, AmazonNotificationService>();
+        services.AddScoped<ITravelAgencyPublisher, TravelAgencyPublisher>();
 
         return services;
     }

@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using TravelAgency.SharedLibrary.RabbitMQ;
 using TravelAgency.UserService.Application.Common.Behaviors;
 
 namespace TravelAgency.UserService.Application;
@@ -16,6 +17,8 @@ public static class ConfigureServices
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(FluentValidationBehavior<,>));
         });
+
+        services.AddRabbitMqPublisher();
 
         return services;
     }

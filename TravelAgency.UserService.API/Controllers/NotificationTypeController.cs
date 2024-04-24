@@ -1,7 +1,5 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TravelAgency.SharedLibrary.Enums;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.CreateNotificationType;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.DeleteNotificationType;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.UpdateNotificationType;
@@ -11,7 +9,7 @@ using TravelAgency.UserService.Application.NotificationTypes.Queries.GetNotifica
 namespace TravelAgency.UserService.API.Controllers;
 
 [ApiController]
-[Route("api/notificationTypes")]
+[Route("api/notification-types")]
 //[Authorize(PolicyNames.SystemAdmin)]
 public class NotificationTypeController : Controller
 {

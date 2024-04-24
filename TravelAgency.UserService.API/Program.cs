@@ -1,9 +1,9 @@
 using Serilog;
 using System.Reflection;
-using TravelAgency.SharedLibrary.Models;
 using TravelAgency.SharedLibrary.Swagger;
 using TravelAgency.UserService.Application;
 using TravelAgency.UserService.Infrastructure;
+using TravelAgency.UserService.Infrastructure.Persistance;
 
 namespace TravelAgency.UserService.API;
 
@@ -14,7 +14,7 @@ public class Program
 
     }
 
-    protected static void Main(string[] args)
+    protected static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +43,13 @@ public class Program
         {
             app.UseSwagger()
                .UseSwaggerUI();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var initialiser = scope.ServiceProvider.GetRequiredService<UserServiceDbContextInitialiser>();
+                await initialiser.InitialiseAsync();
+                await initialiser.SeedAsync();
+            }
         }
 
         app.UseHttpsRedirection();

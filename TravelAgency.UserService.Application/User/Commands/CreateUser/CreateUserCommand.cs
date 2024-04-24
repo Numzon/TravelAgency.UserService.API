@@ -36,7 +36,7 @@ public sealed class CreateUserCommandHandler : IResultRequestHandler<CreateUserC
             }
             else
             {
-                //await _publisher.Publish(new ClientUserCreatedEvent(user.Id));TravelAgency :P
+                await _publisher.Publish(new TravelAgencyUserCreatedEvent(user.Id));
             }
 
             return CustomResults.CreateAtRoute("GetAsync", new {  id = user.Id }, user);
