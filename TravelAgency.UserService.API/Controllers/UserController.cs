@@ -4,7 +4,10 @@ using TravelAgency.UserService.Application.Authentication.Commands.ChangeEmail;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangeUserAttributes;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmChangeEmail;
 using TravelAgency.UserService.Application.User.Commands.ConfirmUserCreation;
-using TravelAgency.UserService.Application.User.Commands.CreateUser;
+using TravelAgency.UserService.Application.User.Commands.CreateClientAccount;
+using TravelAgency.UserService.Application.User.Commands.CreateEmployee;
+using TravelAgency.UserService.Application.User.Commands.CreateManager;
+using TravelAgency.UserService.Application.User.Commands.CreateTravelAgency;
 using TravelAgency.UserService.Application.User.Commands.DeleteUser;
 using TravelAgency.UserService.Application.User.Queries.GetUser;
 
@@ -21,8 +24,32 @@ public class UserController : Controller
         _sender = sender;
     }
 
-    [HttpPost]
-    public async Task<IResult> CreateAsync([FromBody]CreateUserCommand command)
+    [HttpPost("managers")]
+    public async Task<IResult> CreateAsync([FromBody] CreateManagerCommand command)
+    {
+        var result = await _sender.Send(command);
+
+        return result.GetResult();
+    }
+
+    [HttpPost("travel-agencies")]
+    public async Task<IResult> CreateAsync([FromBody] CreateTravelAgencyCommand command)
+    {
+        var result = await _sender.Send(command);
+
+        return result.GetResult();
+    }
+
+    [HttpPost("clients")]
+    public async Task<IResult> CreateAsync([FromBody] CreateClientAccountCommand command)
+    {
+        var result = await _sender.Send(command);
+
+        return result.GetResult();
+    }
+
+    [HttpPost("employees")]
+    public async Task<IResult> CreateAsync([FromBody] CreateEmployeeCommand command)
     {
         var result = await _sender.Send(command);
 

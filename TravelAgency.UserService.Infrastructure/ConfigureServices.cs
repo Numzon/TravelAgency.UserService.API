@@ -1,6 +1,5 @@
 ﻿using Amazon;
 using Amazon.CognitoIdentityProvider;
-using Amazon.SimpleEmailV2;
 using LinqKit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +12,7 @@ using Serilog;
 using System.Data.Common;
 using TravelAgency.SharedLibrary.AWS;
 using TravelAgency.SharedLibrary.Models;
+using TravelAgency.SharedLibrary.RabbitMQ;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Infrastructure.Persistance;
@@ -26,12 +26,10 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, WebApplicationBuilder builder)
     {
-        var awsEnv = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY_ID");
-
         builder.Configuration.AddAndConfigureSecretManager(builder.Environment, RegionEndpoint.EUNorth1);
 
         var connectionString = builder.Configuration.GetConnectionString("UserServiceDatabase");
-        if (string.IsNullOrEmpty(connectionString) || awsEnv is null)
+        if (string.IsNullOrEmpty(connectionString))
         {
             connectionString = builder.BuildConnectionStringFromUserSecrets();
         }
@@ -46,6 +44,7 @@ public static class ConfigureServices
 
         services.RegisterRepositories();
         services.RegisterServices();
+        services.RegisterPublishers();
 
         services.Configure<AwsCognitoSettingsDto>(builder.Configuration.GetRequiredSection("AWS:Cognito"));
         services.Configure<AmazonEmailServiceSettingsDto>(builder.Configuration.GetRequiredSection("AWS:SimpleEmailService"));
@@ -69,6 +68,10 @@ public static class ConfigureServices
             }
         }
 
+        var rabbitMqSettings = builder.Configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqSettingsDto>()!;
+
+        services.AddRabbitMqConfiguration(rabbitMqSettings);
+
         services.AddAuthorizationWithPolicies();
 
         return services;
@@ -89,7 +92,15 @@ public static class ConfigureServices
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IAmazonEmailService, AmazonEmailService>();
         services.AddScoped<IAmazonNotificationService, AmazonNotificationService>();
+
+        return services;
+    }
+
+    private static IServiceCollection RegisterPublishers(this IServiceCollection services)
+    {
         services.AddScoped<ITravelAgencyPublisher, TravelAgencyPublisher>();
+        services.AddScoped<IManagerPublisher, ManagerPublisher>();
+        services.AddScoped<IEmployeePublisher, EmployeePublisher>();
 
         return services;
     }

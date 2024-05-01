@@ -1,7 +1,5 @@
-﻿using Amazon;
-using Amazon.CognitoIdentityProvider;
+﻿using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
-using Amazon.Runtime;
 using AutoMapper;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -15,9 +13,13 @@ using TravelAgency.UserService.Application.Authentication.Commands.ConfirmForgot
 using TravelAgency.UserService.Application.Authentication.Commands.RefreshToken;
 using TravelAgency.UserService.Application.Authentication.Commands.SignIn;
 using TravelAgency.UserService.Application.Authentication.Models;
+using TravelAgency.UserService.Application.Common.Commands;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.User.Commands.ConfirmUserCreation;
-using TravelAgency.UserService.Application.User.Commands.CreateUser;
+using TravelAgency.UserService.Application.User.Commands.CreateClientAccount;
+using TravelAgency.UserService.Application.User.Commands.CreateEmployee;
+using TravelAgency.UserService.Application.User.Commands.CreateManager;
+using TravelAgency.UserService.Application.User.Commands.CreateTravelAgency;
 using TravelAgency.UserService.Application.User.Models;
 using TravelAgency.UserService.Domain.Enums;
 
@@ -67,6 +69,19 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         return _mapper.Map<UserDto>(user);
     }
 
+    public async Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken)
+    {
+        var user = await GetUserAsync($"{CognitoAttributes.Email} = \"{email}\"", cancellationToken);
+
+        if (user is null)
+        {
+            return null!;
+        }
+
+        return _mapper.Map<UserDto>(user);
+    }
+
+
     public async Task<SimpleUserDto?> GetSimpleUserByEmailAsync(string email, CancellationToken cancellationToken)
     {
         var user = await GetUserAsync($"{CognitoAttributes.Email} = \"{email}\"", cancellationToken, true);
@@ -114,27 +129,31 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         await _client.ChangePasswordAsync(changePasswordRequest, cancellationToken);
     }
 
-    public async Task CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken)
+    public async Task CreateClientAccountAsync(CreateClientAccountCommand command, CancellationToken cancellationToken)
     {
-        var userAttributes = GetUserAttributes(command);
+        var userAttributes = GetUserAttributes(command.FirstName, command.LastName);
 
-        var signUpRequest = new SignUpRequest
-        {
-            ClientId = _settings.ClientId,
-            Password = command.Password,
-            UserAttributes = userAttributes,
-            Username = command.Email
-        };
+        await CreateUserAsync(command, userAttributes, CognitoGroups.ClientAccount, cancellationToken);
+    }
+    public async Task CreateTravelAgencyAsync(CreateTravelAgencyCommand command, CancellationToken cancellationToken)
+    {
+        var userAttributes = GetAgencyAttributes(command.AgencyName);
 
-        var addUserToGroupRequest = new AdminAddUserToGroupRequest
-        {
-            GroupName = command.IsTravelAgency ? CognitoGroups.TravelAgencyAccount : CognitoGroups.ClientAccount,
-            Username = command.Email,
-            UserPoolId = _settings.UserPoolId
-        };
+        await CreateUserAsync(command, userAttributes, CognitoGroups.TravelAgencyAccount, cancellationToken);
+    }
 
-        await _client.SignUpAsync(signUpRequest, cancellationToken);
-        await _client.AdminAddUserToGroupAsync(addUserToGroupRequest, cancellationToken);
+    public async Task CreateManagerAsync(CreateManagerCommand command, CancellationToken cancellationToken)
+    {
+        var userAttributes = GetUserAttributes(command.FirstName, command.LastName);
+
+        await CreateUserAsync(command, userAttributes, command.Group, cancellationToken);
+    }
+
+    public async Task CreateEmployeeAsync(CreateEmployeeCommand command, CancellationToken cancellationToken)
+    {
+        var userAttributes = GetUserAttributes(command.FirstName, command.LastName);
+
+        await CreateUserAsync(command, userAttributes, CognitoGroups.Employee, cancellationToken);
     }
 
     public async Task ConfirmUserCreationAsync(ConfirmUserCreationCommand command, CancellationToken cancellationToken)
@@ -246,7 +265,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
 
         if (response.Groups.IsNullOrEmpty())
         {
-            return Enumerable.Empty<string>();  
+            return Enumerable.Empty<string>();
         }
 
         return response.Groups.Select(x => x.GroupName);
@@ -279,21 +298,41 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         return response.Users.SingleOrDefault();
     }
 
-
-    private List<AttributeType> GetUserAttributes(CreateUserCommand command)
+    private async Task CreateUserAsync(CreateUserCommand command, List<AttributeType> attributes, string group, CancellationToken cancellationToken)
     {
-        if (command.IsTravelAgency)
+        var signUpRequest = new SignUpRequest
         {
-            return new List<AttributeType>
-            {
-                new() { Name = CognitoAttributes.AgencyName, Value = command.AgencyName }
-            };
-        }
+            ClientId = _settings.ClientId,
+            Password = command.Password,
+            UserAttributes = attributes,
+            Username = command.Email
+        };
 
+        var addUserToGroupRequest = new AdminAddUserToGroupRequest
+        {
+            GroupName = group,
+            Username = command.Email,
+            UserPoolId = _settings.UserPoolId
+        };
+
+        await _client.SignUpAsync(signUpRequest, cancellationToken);
+        await _client.AdminAddUserToGroupAsync(addUserToGroupRequest, cancellationToken);
+    }
+
+    private List<AttributeType> GetUserAttributes(string firstName, string lastName)
+    {
         return new List<AttributeType>
         {
-            new() { Name = CognitoAttributes.GivenName, Value = command.GivenName },
-            new() { Name = CognitoAttributes.FamilyName, Value = command.FamilyName }
+            new() { Name = CognitoAttributes.GivenName, Value = firstName },
+            new() { Name = CognitoAttributes.FamilyName, Value = lastName }
+        };
+    }
+
+    private List<AttributeType> GetAgencyAttributes(string agencyName)
+    {
+        return new List<AttributeType>
+        {
+                new() { Name = CognitoAttributes.AgencyName, Value = agencyName }
         };
     }
 }

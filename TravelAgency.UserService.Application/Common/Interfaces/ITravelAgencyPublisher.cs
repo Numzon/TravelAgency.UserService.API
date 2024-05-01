@@ -1,4 +1,5 @@
-﻿using TravelAgency.SharedLibrary.Models;
+﻿
+using TravelAgency.UserService.Application.Common.Models;
 
 namespace TravelAgency.UserService.Application.Common.Interfaces;
 public interface ITravelAgencyPublisher

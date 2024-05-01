@@ -7,7 +7,7 @@ using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Domain.Events;
 
-namespace TravelAgency.UserService.Application.ClientAccounts.EventHandlers;
+namespace TravelAgency.UserService.Application.User.EventHandlers;
 public sealed class TravelAgencyUserCreatedEventHandler : INotificationHandler<TravelAgencyUserCreatedEvent>
 {
     private readonly ITravelAgencyPublisher _publisher;
@@ -24,7 +24,6 @@ public sealed class TravelAgencyUserCreatedEventHandler : INotificationHandler<T
         try
         {
             var userPublisher = _mapper.Map<TravelAgencyPublishedDto>(notification);
-            userPublisher.Event = EventTypes.TravelAgencyUserCreated;
             await _publisher.PublishTravelAgencyCreated(userPublisher);
         }
         catch (Exception ex)
@@ -33,4 +32,3 @@ public sealed class TravelAgencyUserCreatedEventHandler : INotificationHandler<T
         }
     }
 }
-    

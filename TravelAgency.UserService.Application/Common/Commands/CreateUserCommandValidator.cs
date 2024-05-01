@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 
-namespace TravelAgency.UserService.Application.User.Commands.CreateUser;
-public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
+namespace TravelAgency.UserService.Application.Common.Commands;
+public abstract class CreateUserCommandValidator<TCreateUserCommand> : AbstractValidator<TCreateUserCommand>
+    where TCreateUserCommand : CreateUserCommand
 {
-    public CreateUserCommandValidator()
+    protected CreateUserCommandValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty()

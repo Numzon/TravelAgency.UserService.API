@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System.Data.Common;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Infrastructure.Persistance;

@@ -3,8 +3,8 @@ using Serilog;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Domain.Events;
 
-namespace TravelAgency.UserService.Application.ClientAccounts.EventHandlers;
-public class ClientUserCreatedEventHandler : INotificationHandler<ClientUserCreatedEvent>
+namespace TravelAgency.UserService.Application.User.EventHandlers;
+public sealed class ClientUserCreatedEventHandler : INotificationHandler<ClientUserCreatedEvent>
 {
     private readonly IClientAccountRepository _repository;
 

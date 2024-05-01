@@ -7,7 +7,10 @@ using TravelAgency.UserService.Application.Authentication.Commands.RefreshToken;
 using TravelAgency.UserService.Application.Authentication.Commands.SignIn;
 using TravelAgency.UserService.Application.Authentication.Models;
 using TravelAgency.UserService.Application.User.Commands.ConfirmUserCreation;
-using TravelAgency.UserService.Application.User.Commands.CreateUser;
+using TravelAgency.UserService.Application.User.Commands.CreateClientAccount;
+using TravelAgency.UserService.Application.User.Commands.CreateEmployee;
+using TravelAgency.UserService.Application.User.Commands.CreateManager;
+using TravelAgency.UserService.Application.User.Commands.CreateTravelAgency;
 using TravelAgency.UserService.Application.User.Models;
 
 namespace TravelAgency.UserService.Application.Common.Interfaces;
@@ -15,13 +18,17 @@ public interface IAmazonCognitoService
 {
     Task<SignInResponseDto> SingInAsync(SignInCommand request, CancellationToken cancellationToken);
     Task<UserDto?> GetUserByIdAsync(string id, CancellationToken cancellationToken);
+    Task<UserDto?> GetUserByEmailAsync(string email, CancellationToken cancellationToken);
     Task<RefreshTokenResponseDto> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken);
     Task<SimpleUserDto?> GetSimpleUserByEmailAsync(string email, CancellationToken cancellationToken);
     Task<SimpleUserDto?> GetSimpleUserByIdAsync(string id, CancellationToken cancellationToken);
     Task ForgotPasswordAsync(string userId, CancellationToken cancellationToken);
     Task ConfirmForgotPasswordAsync(ConfirmForgotPasswordCommand command, CancellationToken cancellationToken);
     Task ChangePasswordAsync(ChangePasswordCommand request, CancellationToken cancellationToken);
-    Task CreateUserAsync(CreateUserCommand command, CancellationToken cancellationToken);
+    Task CreateClientAccountAsync(CreateClientAccountCommand command, CancellationToken cancellationToken);
+    Task CreateTravelAgencyAsync(CreateTravelAgencyCommand command, CancellationToken cancellationToken);
+    Task CreateManagerAsync(CreateManagerCommand command, CancellationToken cancellationToken);
+    Task CreateEmployeeAsync(CreateEmployeeCommand command, CancellationToken cancellationToken);
     Task ConfirmUserCreationAsync(ConfirmUserCreationCommand command, CancellationToken cancellationToken);
     Task DeleteUserAsync(string email, CancellationToken cancellationToken);
     Task ChangeEmailAsync(ChangeEmailCommand command, CancellationToken cancellationToken);
