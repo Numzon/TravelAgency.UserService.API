@@ -1,22 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http;
 
 namespace TravelAgency.UserService.Application.Common.Errors;
-public sealed class NotFoundError : BaseError
+public sealed class NotFoundError<T> : BaseError
 {
-    private readonly string? _stringId;
-    private readonly int? _intId;
+    private readonly T? _id;
 
-    public override string? Message => $"Element with Id: {_stringId ?? _intId?.ToString() ?? string.Empty} not found";
+    public override string? Message => $"Element with Id: {_id?.ToString() ?? string.Empty} not found";
 
-    public NotFoundError(int id)
+    public NotFoundError(T id)
     {
-        _intId = id;
+        _id = id;
     }
 
-    public NotFoundError(string id)
+    public NotFoundError()
     {
-        _stringId = id;
+
     }
+
 
     public override IResult GetErrorResult()
     {

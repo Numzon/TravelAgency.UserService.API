@@ -30,6 +30,6 @@ public sealed class CreateNotificationTypeCommandHandler : IResultRequestHandler
 
         var mappedType = _mapper.Map<NotificationTypeDto>(result);
 
-        return CustomResults.CreateAtRoute("Get", new { id = result.Id }, mappedType);
+        return CustomResults.CreateAtRoute("GetAsync", new { id = result.Id }, mappedType);
     }
 }

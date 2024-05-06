@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using FluentAssertions.Common;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System.Security.Authentication;
 using System.Security.Claims;
@@ -53,7 +54,9 @@ public sealed class CurrentUserServiceTests
     {
         var service = new CurrentUserService(_accessor.Object);
 
-        service.Invoking(x => x.Id).Should().Throw<AuthenticationException>().WithMessage("Invalid user id");
+        var result = service.Id;
+
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -82,7 +85,9 @@ public sealed class CurrentUserServiceTests
     {
         var service = new CurrentUserService(_accessor.Object);
 
-        service.Invoking(x => x.AccessToken).Should().Throw<AuthenticationException>().WithMessage("Invalid user access token");
+        var result = service.AccessToken;
+
+        result.Should().BeNull();   
     }
 
     private AuthenticateResult GetDummyAuthenticationResult()

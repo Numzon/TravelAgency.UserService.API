@@ -14,10 +14,12 @@ public sealed class EmployeePublisher : IEmployeePublisher
         _publisher = publisher;
     }
 
-    public async Task PublishEmployeeCreated(EmployeePublishedDto user)
+    public async Task PublishUserForEmployeeCreated(string userId, int employeeId, CancellationToken cancellationToken)
     {
-        user.Event = EventTypes.EmployeeCreated;
-        var message = JsonSerializer.Serialize(user);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var model = new UserForEmployeeCreatedPublishedDto { EmployeeId = employeeId, UserId = userId, Event = EventTypes.UserForEmployeeCreated };
+        var message = JsonSerializer.Serialize(model);
         await _publisher.Publish(message);
     }
 }

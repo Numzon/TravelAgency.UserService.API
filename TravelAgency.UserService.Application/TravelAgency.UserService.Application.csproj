@@ -8,8 +8,11 @@
 
   <ItemGroup>
     <Compile Remove="Authentication\Queries\**" />
+    <Compile Remove="NotificationTemplates\**" />
     <EmbeddedResource Remove="Authentication\Queries\**" />
+    <EmbeddedResource Remove="NotificationTemplates\**" />
     <None Remove="Authentication\Queries\**" />
+    <None Remove="NotificationTemplates\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,17 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="NotificationTemplates\Commands\" />
-    <Folder Include="NotificationTemplates\Models\" />
-    <Folder Include="NotificationTemplates\Queries\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="3.3.107.17" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.18" />
-    <PackageReference Include="TravelAgency.SharedLibrary" Version="1.0.12" />
+    <PackageReference Include="TravelAgency.SharedLibrary" Version="1.0.15" />
   </ItemGroup>
 
 </Project>

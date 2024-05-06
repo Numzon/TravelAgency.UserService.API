@@ -33,7 +33,7 @@ public sealed class CreateClientAccountCommandHandler : IResultRequestHandler<Cr
                 return CustomErrors.NotFound(request.Email);
             }
 
-            await _publisher.Publish(new ClientUserCreatedEvent(user.Id), cancellationToken);
+            await _publisher.Publish(new ClientUserCreatedEvent(user.Id, user.Email, request.FirstName, request.LastName), cancellationToken);
 
             return CustomResults.CreateAtRoute("GetAsync", new { id = user.Id }, user);
         }

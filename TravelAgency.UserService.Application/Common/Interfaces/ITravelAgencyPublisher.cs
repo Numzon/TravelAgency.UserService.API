@@ -1,8 +1,5 @@
-﻿
-using TravelAgency.UserService.Application.Common.Models;
-
-namespace TravelAgency.UserService.Application.Common.Interfaces;
+﻿namespace TravelAgency.UserService.Application.Common.Interfaces;
 public interface ITravelAgencyPublisher
 {
-    Task PublishTravelAgencyCreated(TravelAgencyPublishedDto user);
+    Task PublishTravelAgencyCreated(string userId, string agencyName, CancellationToken cancellationToken);
 }

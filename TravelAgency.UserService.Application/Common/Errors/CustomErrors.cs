@@ -3,14 +3,14 @@
 namespace TravelAgency.UserService.Application.Common.Errors;
 public static class CustomErrors
 {
-    public static NotFoundError NotFound(int id)
+    public static NotFoundError<int> NotFound(int id)
     {
-        return new NotFoundError(id);
+        return new NotFoundError<int>(id);
     }
 
-    public static NotFoundError NotFound(string id)
+    public static NotFoundError<string> NotFound(string id)
     {
-        return new NotFoundError(id);
+        return new NotFoundError<string>(id);
     }
 
     public static RepositoryError Repository(string methodName)

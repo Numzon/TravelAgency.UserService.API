@@ -17,7 +17,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.17")
+                .HasAnnotation("ProductVersion", "7.0.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -39,10 +39,22 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
                     b.Property<int?>("CreditCardId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("LastModified")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -55,7 +67,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[CreditCardId] IS NOT NULL");
 
-                    b.ToTable("ClientAccount", (string)null);
+                    b.ToTable("ClientAccount");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.CreditCard", b =>
@@ -91,7 +103,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CreditCard", (string)null);
+                    b.ToTable("CreditCard");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.NotificationTemplate", b =>
@@ -129,7 +141,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
 
                     b.HasIndex("NotificationTypeId");
 
-                    b.ToTable("NotificationTemplate", (string)null);
+                    b.ToTable("NotificationTemplate");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.NotificationType", b =>
@@ -158,7 +170,7 @@ namespace TravelAgency.UserService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NotificationTypes", (string)null);
+                    b.ToTable("NotificationTypes");
                 });
 
             modelBuilder.Entity("TravelAgency.UserService.Domain.Entities.ClientAccount", b =>

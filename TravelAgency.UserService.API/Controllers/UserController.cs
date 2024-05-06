@@ -5,11 +5,10 @@ using TravelAgency.UserService.Application.Authentication.Commands.ChangeUserAtt
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmChangeEmail;
 using TravelAgency.UserService.Application.User.Commands.ConfirmUserCreation;
 using TravelAgency.UserService.Application.User.Commands.CreateClientAccount;
-using TravelAgency.UserService.Application.User.Commands.CreateEmployee;
-using TravelAgency.UserService.Application.User.Commands.CreateManager;
 using TravelAgency.UserService.Application.User.Commands.CreateTravelAgency;
 using TravelAgency.UserService.Application.User.Commands.DeleteUser;
 using TravelAgency.UserService.Application.User.Queries.GetUser;
+using TravelAgency.UserService.Application.User.Queries.GetUserByEmail;
 
 namespace TravelAgency.UserService.API.Controllers;
 
@@ -22,14 +21,6 @@ public class UserController : Controller
     public UserController(ISender sender)
     {
         _sender = sender;
-    }
-
-    [HttpPost("managers")]
-    public async Task<IResult> CreateAsync([FromBody] CreateManagerCommand command)
-    {
-        var result = await _sender.Send(command);
-
-        return result.GetResult();
     }
 
     [HttpPost("travel-agencies")]
@@ -48,14 +39,6 @@ public class UserController : Controller
         return result.GetResult();
     }
 
-    [HttpPost("employees")]
-    public async Task<IResult> CreateAsync([FromBody] CreateEmployeeCommand command)
-    {
-        var result = await _sender.Send(command);
-
-        return result.GetResult();
-    }
-
     [HttpPost("confirm-user-creation")]
     public async Task<IResult> ConfirmUserCreationAsync([FromBody]ConfirmUserCreationCommand command)
     {
@@ -68,6 +51,15 @@ public class UserController : Controller
     public async Task<IResult> GetAsync([FromQuery]string id)
     {
         var result = await _sender.Send(new GetUserQuery(id));
+
+        return result.GetResult();
+    }
+
+    //only for manager and travelAgency
+    [HttpGet("validate-email")]
+    public async Task<IResult> GetUserByEmailAsync([FromQuery] string email)
+    {
+        var result = await _sender.Send(new GetUserByEmailQuery(email));
 
         return result.GetResult();
     }

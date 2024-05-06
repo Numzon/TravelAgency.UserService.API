@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using TravelAgency.SharedLibrary.Enums;
-using TravelAgency.SharedLibrary.Models;
 using TravelAgency.SharedLibrary.RabbitMQ.Interfaces;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Models;
@@ -15,10 +14,12 @@ public sealed class TravelAgencyPublisher : ITravelAgencyPublisher
         _publisher = publisher;
     }
 
-    public async Task PublishTravelAgencyCreated(TravelAgencyPublishedDto user)
+    public async Task PublishTravelAgencyCreated(string userId, string agencyName, CancellationToken cancellationToken)
     {
-        user.Event = EventTypes.TravelAgencyUserCreated;
-        var message = JsonSerializer.Serialize(user);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var model = new TravelAgencyCreatedPublishedDto { UserId = userId, AgencyName = agencyName, Event = EventTypes.TravelAgencyUserCreated };
+        var message = JsonSerializer.Serialize(model);
         await _publisher.Publish(message);
     }
 }

@@ -20,7 +20,12 @@ public sealed class SignInCommandHandler : IResultRequestHandler<SignInCommand>
         {
             var result = await _amazonService.SingInAsync(request, cancellationToken);
 
-            return CustomResults.Ok(result);
+            if (result.ChallengeResponse is not null)
+            {
+                return CustomErrors.BadRequest(result.ChallengeResponse);
+            }
+
+            return CustomResults.Ok(result.AuthResponse);
         }
         catch (Exception ex)
         {

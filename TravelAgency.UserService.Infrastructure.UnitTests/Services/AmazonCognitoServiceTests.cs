@@ -48,8 +48,9 @@ public sealed class AmazonCognitoServiceTests
 
         result.Should().NotBeNull();
         result.GetType().Should().Be(typeof(SignInResponseDto));
-        result.AccessToken.Should().NotBeNullOrEmpty().And.Be(response.AuthenticationResult.AccessToken);
-        result.RefreshToken.Should().NotBeNullOrEmpty().And.Be(response.AuthenticationResult.RefreshToken);
+        result.AuthResponse.Should().NotBeNull();
+        result.AuthResponse!.AccessToken.Should().NotBeNullOrEmpty().And.Be(response.AuthenticationResult.AccessToken);
+        result.AuthResponse!.RefreshToken.Should().NotBeNullOrEmpty().And.Be(response.AuthenticationResult.RefreshToken);
     }
 
     [Fact]

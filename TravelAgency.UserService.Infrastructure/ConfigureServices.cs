@@ -26,7 +26,7 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, WebApplicationBuilder builder)
     {
-        builder.Configuration.AddAndConfigureSecretManager(builder.Environment, RegionEndpoint.EUNorth1);
+        //builder.Configuration.AddAndConfigureSecretManager(builder.Environment, RegionEndpoint.EUNorth1);
 
         var connectionString = builder.Configuration.GetConnectionString("UserServiceDatabase");
         if (string.IsNullOrEmpty(connectionString))

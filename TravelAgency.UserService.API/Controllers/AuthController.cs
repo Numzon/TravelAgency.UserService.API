@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangePassword;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmForgotPassword;
 using TravelAgency.UserService.Application.Authentication.Commands.ForgotPassword;
+using TravelAgency.UserService.Application.Authentication.Commands.NewPassword;
 using TravelAgency.UserService.Application.Authentication.Commands.RefreshToken;
 using TravelAgency.UserService.Application.Authentication.Commands.SignIn;
 
@@ -29,6 +30,14 @@ public class AuthController : Controller
 
     [HttpPost("change-password")]
     public async Task<IResult> ChangePasswordAsync([FromBody] ChangePasswordCommand command)
+    {
+        var result = await _sender.Send(command);
+
+        return result.GetResult();
+    }
+
+    [HttpPost("new-password")]
+    public async Task<IResult> NewPasswordAsync([FromBody] NewPasswordCommand command)
     {
         var result = await _sender.Send(command);
 

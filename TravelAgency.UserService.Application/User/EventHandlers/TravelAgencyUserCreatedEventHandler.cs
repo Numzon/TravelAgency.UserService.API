@@ -1,30 +1,23 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using Serilog;
-using TravelAgency.SharedLibrary.Enums;
-using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Common.Interfaces;
-using TravelAgency.UserService.Application.Common.Models;
 using TravelAgency.UserService.Domain.Events;
 
 namespace TravelAgency.UserService.Application.User.EventHandlers;
 public sealed class TravelAgencyUserCreatedEventHandler : INotificationHandler<TravelAgencyUserCreatedEvent>
 {
     private readonly ITravelAgencyPublisher _publisher;
-    private readonly IMapper _mapper;
 
-    public TravelAgencyUserCreatedEventHandler(ITravelAgencyPublisher publisher, IMapper mapper)
+    public TravelAgencyUserCreatedEventHandler(ITravelAgencyPublisher publisher)
     {
         _publisher = publisher;
-        _mapper = mapper;
     }
 
     public async Task Handle(TravelAgencyUserCreatedEvent notification, CancellationToken cancellationToken)
     {
         try
         {
-            var userPublisher = _mapper.Map<TravelAgencyPublishedDto>(notification);
-            await _publisher.PublishTravelAgencyCreated(userPublisher);
+            await _publisher.PublishTravelAgencyCreated(notification.UserId, notification.AgencyName, cancellationToken);
         }
         catch (Exception ex)
         {

@@ -5,7 +5,7 @@ using TravelAgency.UserService.Application.NotificationTypes.Queries.GetNotifica
 using TravelAgency.UserService.Domain.Entities;
 using TravelAgency.UserService.Infrastructure.Repositories;
 using TravelAgency.UserService.SharedTestLibrary.BaseTests;
-using TravelAgency.UserService.SharedTestLibrary.Helpers;
+using TravelAgency.UserService.Tests.Shared.Helpers;
 
 namespace TravelAgency.UserService.Infrastructure.IntegrationTests.Repositories;
 public sealed class NotificationTypeRepositoryTests : BaseInMemoryDbTest

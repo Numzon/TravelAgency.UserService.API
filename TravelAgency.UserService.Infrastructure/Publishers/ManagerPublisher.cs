@@ -14,10 +14,12 @@ public class ManagerPublisher : IManagerPublisher
         _publisher = publisher;
     }
 
-    public async Task PublishManagerCreated(ManagerPublishedDto user)
+    public async Task PublishUserForManagerCreated(string userId, int managerId, CancellationToken cancellationToken)
     {
-        user.Event = EventTypes.ManagerCreated;
-        var message = JsonSerializer.Serialize(user);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var model = new UserForManagerCreatedPublishedDto { Event = EventTypes.UserForManagerCreated, ManagerId = managerId, UserId = userId };
+        var message = JsonSerializer.Serialize(model);
         await _publisher.Publish(message);
     }
 }

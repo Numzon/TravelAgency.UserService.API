@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TravelAgency.UserService.Infrastructure\TravelAgency.UserService.Infrastructure.csproj" />
-    <ProjectReference Include="..\TravelAgency.UserService.SharedTestLibrary\TravelAgency.UserService.SharedTestLibrary.csproj" />
+    <ProjectReference Include="..\TravelAgency.UserService.Tests.Shared\TravelAgency.UserService.Tests.Shared.csproj" />
   </ItemGroup>
 
 </Project>
