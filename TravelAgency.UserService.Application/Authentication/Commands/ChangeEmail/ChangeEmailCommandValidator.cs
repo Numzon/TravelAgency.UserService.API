@@ -8,6 +8,7 @@ public sealed class ChangeEmailCommandValidator : AbstractValidator<ChangeEmailC
         RuleFor(x => x.AccessToken)
             .NotEmpty();
         RuleFor(x => x.NewEmail)
-            .NotEmpty();
+            .NotEmpty()
+            .EmailAddress();
     }
 }

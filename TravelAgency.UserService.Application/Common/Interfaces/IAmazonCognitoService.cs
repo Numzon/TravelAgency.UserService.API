@@ -1,6 +1,5 @@
 ﻿using TravelAgency.UserService.Application.Authentication.Commands.ChangeEmail;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangePassword;
-using TravelAgency.UserService.Application.Authentication.Commands.ChangeUserAttributes;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmChangeEmail;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmForgotPassword;
 using TravelAgency.UserService.Application.Authentication.Commands.NewPassword;
@@ -26,13 +25,12 @@ public interface IAmazonCognitoService
     Task ConfirmForgotPasswordAsync(ConfirmForgotPasswordCommand command, CancellationToken cancellationToken);
     Task ChangePasswordAsync(ChangePasswordCommand request, CancellationToken cancellationToken);
     Task<AuthResponseDto> NewPasswordAsync(NewPasswordCommand command, CancellationToken cancellationToken);
-    Task CreateClientAccountAsync(CreateClientAccountCommand command, CancellationToken cancellationToken);
-    Task CreateTravelAgencyAsync(CreateTravelAgencyCommand command, CancellationToken cancellationToken);
+    Task<string> CreateClientAccountAsync(CreateClientAccountCommand command, CancellationToken cancellationToken);
+    Task<string> CreateTravelAgencyAsync(CreateTravelAgencyCommand command, CancellationToken cancellationToken);
     Task ConfirmUserCreationAsync(ConfirmUserCreationCommand command, CancellationToken cancellationToken);
     Task DeleteUserAsync(string email, CancellationToken cancellationToken);
     Task ChangeEmailAsync(ChangeEmailCommand command, CancellationToken cancellationToken);
     Task ConfrimChangeEmailAsync(ConfirmChangeEmailCommand command, CancellationToken cancellationToken);
-    Task ChangeUserAttributesAsync(ChangeUserAttributesCommand command, CancellationToken cancellationToken);
     Task<IEnumerable<string>> GetUserGroupsAsync(string userId, CancellationToken cancellationToken);
     Task<SimpleUserDto> CreateManagerAsync(CreateManagerDto manager, CancellationToken cancellationToken);
     Task<SimpleUserDto> CreateEmployeeAsync(string email, CancellationToken cancellationToken);

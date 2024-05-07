@@ -14,12 +14,6 @@ public sealed class UserProfile : Profile
         CreateMap<UserType, UserDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Attributes.Single(a => a.Name == CognitoAttributes.Id).Value))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Attributes.Single(a => a.Name == CognitoAttributes.Email).Value))
-            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.Attributes.Any(a => a.Name == CognitoAttributes.GivenName) ?
-                    src.Attributes.Single(a => a.Name == CognitoAttributes.GivenName).Value : default))
-            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.Attributes.Any(a => a.Name == CognitoAttributes.FamilyName) ?
-                    src.Attributes.Single(a => a.Name == CognitoAttributes.FamilyName).Value : default))
-            .ForMember(dest => dest.AgencyName, opt => opt.MapFrom(src => src.Attributes.Any(a => a.Name == CognitoAttributes.AgencyName) ?
-                    src.Attributes.Single(a => a.Name == CognitoAttributes.AgencyName).Value : default))
             .ForMember(dest => dest.IsVerified, opt => opt.MapFrom(src => Convert.ToBoolean(src.Attributes.Single(a => a.Name == CognitoAttributes.EmailVerified).Value)))
             .ForMember(dest => dest.IsDisabled, opt => opt.MapFrom(src => !src.Enabled));
 
@@ -31,9 +25,7 @@ public sealed class UserProfile : Profile
 
         CreateMap<TravelAgencyUserCreatedEvent, TravelAgencyCreatedPublishedDto>();
 
-        CreateMap<ManagerUserCreatedEvent, ManagerCreatedPublishedDto>();
-
-        CreateMap<EmployeeUserCreatedEvent, EmployeeCreatedPublishedDto>();
+        CreateMap<ManagerCreatedPublishedDto, CreateManagerDto>();
 
         CreateMap<SimpleUserDto, UserForEmployeeCreatedPublishedDto>()
             .ForMember(x => x.UserId, opt => opt.MapFrom(src => src.Id));

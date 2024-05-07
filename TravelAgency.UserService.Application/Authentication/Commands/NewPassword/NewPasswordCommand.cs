@@ -3,7 +3,7 @@ using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Result;
 
 namespace TravelAgency.UserService.Application.Authentication.Commands.NewPassword;
-public sealed record NewPasswordCommand(string Email, string Password, string Session) : IResultRequest;
+public sealed record NewPasswordCommand(string Email, string Password, string ConfirmPassword, string Session) : IResultRequest;
 
 public sealed class NewPasswordCommandHandler : IResultRequestHandler<NewPasswordCommand>
 {

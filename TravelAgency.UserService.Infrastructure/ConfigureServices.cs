@@ -15,6 +15,7 @@ using TravelAgency.SharedLibrary.Models;
 using TravelAgency.SharedLibrary.RabbitMQ;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.Common.Models;
+using TravelAgency.UserService.Infrastructure.Configs;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Infrastructure.Persistance.Interceptors;
 using TravelAgency.UserService.Infrastructure.Publishers;
@@ -69,6 +70,8 @@ public static class ConfigureServices
         }
 
         var rabbitMqSettings = builder.Configuration.GetRequiredSection("RabbitMQ").Get<RabbitMqSettingsDto>()!;
+
+        builder.Services.AddSingleton(EventReceiverConfig.GetGlobalSettingsConfiguration());
 
         services.AddRabbitMqConfiguration(rabbitMqSettings);
 

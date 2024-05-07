@@ -6,7 +6,8 @@ public sealed class ConfirmForgotPasswordCommandValidator : AbstractValidator<Co
     public ConfirmForgotPasswordCommandValidator()
     {
         RuleFor(x => x.Email)
-            .NotEmpty();
+            .NotEmpty()
+            .EmailAddress();
 
         RuleFor(x => x.NewPassword)
             .NotEmpty();

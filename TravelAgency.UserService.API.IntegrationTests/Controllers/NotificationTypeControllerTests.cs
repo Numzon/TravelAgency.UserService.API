@@ -1,28 +1,20 @@
 ﻿using Cysharp.Web;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mime;
-using System.Net.WebSockets;
-using System.Security.Policy;
 using System.Text;
 using TravelAgency.UserService.Application.Common.Errors;
 using TravelAgency.UserService.Application.Common.Interfaces;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.CreateNotificationType;
 using TravelAgency.UserService.Application.NotificationTypes.Commands.UpdateNotificationType;
 using TravelAgency.UserService.Application.NotificationTypes.Models;
-using TravelAgency.UserService.Application.NotificationTypes.Queries.GetNotificationTypeQuery;
 using TravelAgency.UserService.Application.NotificationTypes.Queries.GetNotificationTypesQuery;
 using TravelAgency.UserService.Domain.Entities;
 using TravelAgency.UserService.Infrastructure.Persistance;
 using TravelAgency.UserService.Tests.Shared.Configurations;
 using TravelAgency.UserService.Tests.Shared.Enums;
 using TravelAgency.UserService.Tests.Shared.Helpers;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TravelAgency.UserService.API.IntegrationTests.Controllers;
 

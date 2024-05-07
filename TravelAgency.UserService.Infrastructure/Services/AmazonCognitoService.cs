@@ -7,7 +7,6 @@ using TravelAgency.SharedLibrary.Enums;
 using TravelAgency.SharedLibrary.Models;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangeEmail;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangePassword;
-using TravelAgency.UserService.Application.Authentication.Commands.ChangeUserAttributes;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmChangeEmail;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmForgotPassword;
 using TravelAgency.UserService.Application.Authentication.Commands.NewPassword;
@@ -134,13 +133,13 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         await _client.ChangePasswordAsync(changePasswordRequest, cancellationToken);
     }
 
-    public async Task CreateClientAccountAsync(CreateClientAccountCommand command, CancellationToken cancellationToken)
+    public async Task<string> CreateClientAccountAsync(CreateClientAccountCommand command, CancellationToken cancellationToken)
     {
-        await CreateUserAsync(command, CognitoGroups.ClientAccount, cancellationToken);
+        return await CreateUserAsync(command, CognitoGroups.ClientAccount, cancellationToken);
     }
-    public async Task CreateTravelAgencyAsync(CreateTravelAgencyCommand command, CancellationToken cancellationToken)
+    public async Task<string> CreateTravelAgencyAsync(CreateTravelAgencyCommand command, CancellationToken cancellationToken)
     {
-        await CreateUserAsync(command, CognitoGroups.TravelAgencyAccount, cancellationToken);
+        return await CreateUserAsync(command, CognitoGroups.TravelAgencyAccount, cancellationToken);
     }
 
     public async Task<SimpleUserDto> CreateManagerAsync(CreateManagerDto manager, CancellationToken cancellationToken)
@@ -222,22 +221,6 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         await _client.UpdateUserAttributesAsync(request, cancellationToken);
     }
 
-    public async Task ChangeUserAttributesAsync(ChangeUserAttributesCommand command, CancellationToken cancellationToken)
-    {
-        var request = new UpdateUserAttributesRequest
-        {
-            AccessToken = command.AccessToken,
-            UserAttributes = new List<AttributeType>
-            {
-                new() { Name = CognitoAttributes.GivenName, Value = command.GivenName ?? string.Empty },
-                new() { Name = CognitoAttributes.FamilyName, Value = command.FamilyName ?? string.Empty },
-                new() { Name = CognitoAttributes.AgencyName, Value = command.AgencyName ?? string.Empty },
-            }
-        };
-
-        await _client.UpdateUserAttributesAsync(request, cancellationToken);
-    }
-
     public async Task ConfrimChangeEmailAsync(ConfirmChangeEmailCommand command, CancellationToken cancellationToken)
     {
         var request = new VerifyUserAttributeRequest
@@ -284,6 +267,22 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         var response = await _client.RespondToAuthChallengeAsync(request);
 
         AuthenticationResultType authResult = response.AuthenticationResult;
+
+        var updateRequest = new AdminUpdateUserAttributesRequest
+        {
+            UserAttributes = new List<AttributeType>
+            {
+                new AttributeType
+                {
+                    Name = CognitoAttributes.EmailVerified,
+                    Value = "true"
+                }
+            },
+            UserPoolId = _settings.UserPoolId,
+            Username = command.Email
+        };
+
+        await _client.AdminUpdateUserAttributesAsync(updateRequest, cancellationToken);   
 
         return new AuthResponseDto(authResult.AccessToken, authResult.RefreshToken);
     }
@@ -336,7 +335,7 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
         return response.Users.SingleOrDefault();
     }
 
-    private async Task CreateUserAsync(CreateUserCommand command, string group, CancellationToken cancellationToken)
+    private async Task<string> CreateUserAsync(CreateUserCommand command, string group, CancellationToken cancellationToken)
     {
         var signUpRequest = new SignUpRequest
         {
@@ -352,7 +351,9 @@ public sealed class AmazonCognitoService : IAmazonCognitoService
             UserPoolId = _settings.UserPoolId
         };
 
-        await _client.SignUpAsync(signUpRequest, cancellationToken);
+        var signUpResponse = await _client.SignUpAsync(signUpRequest, cancellationToken);
         await _client.AdminAddUserToGroupAsync(addUserToGroupRequest, cancellationToken);
+
+        return signUpResponse.UserSub;
     }
 }

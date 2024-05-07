@@ -25,17 +25,16 @@ public sealed class CreateClientAccountCommandHandler : IResultRequestHandler<Cr
     {
         try
         {
-            await _amazonService.CreateClientAccountAsync(request, cancellationToken);
-            var user = await _amazonService.GetSimpleUserByEmailAsync(request.Email, cancellationToken);
+            var userId = await _amazonService.CreateClientAccountAsync(request, cancellationToken);
 
-            if (user == null)
+            if (userId == null)
             {
                 return CustomErrors.NotFound(request.Email);
             }
 
-            await _publisher.Publish(new ClientUserCreatedEvent(user.Id, user.Email, request.FirstName, request.LastName), cancellationToken);
+            await _publisher.Publish(new ClientUserCreatedEvent(userId, request.Email, request.FirstName, request.LastName), cancellationToken);
 
-            return CustomResults.CreateAtRoute("GetAsync", new { id = user.Id }, user);
+            return CustomResults.CreateAtRoute("GetAsync", new { id = userId }, new { Id = userId, Email = request.Email });
         }
         catch (Exception ex)
         {

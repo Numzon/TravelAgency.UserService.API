@@ -25,17 +25,16 @@ public sealed class CreateTravelAgencyCommandHandler : IResultRequestHandler<Cre
     {
         try
         {
-            await _amazonService.CreateTravelAgencyAsync(request, cancellationToken);
-            var user = await _amazonService.GetSimpleUserByEmailAsync(request.Email, cancellationToken);
+            var userId = await _amazonService.CreateTravelAgencyAsync(request, cancellationToken);
 
-            if (user == null)
+            if (userId == null)
             {
                 return CustomErrors.NotFound(request.Email);
             }
 
-            await _publisher.Publish(new TravelAgencyUserCreatedEvent(user.Id, request.AgencyName), cancellationToken);
+            await _publisher.Publish(new TravelAgencyUserCreatedEvent(userId, request.AgencyName), cancellationToken);
 
-            return CustomResults.CreateAtRoute("GetAsync", new { id = user.Id }, user);
+            return CustomResults.CreateAtRoute("GetAsync", new { id = userId }, new { Id = userId, Email = request.Email });
         }
         catch (Exception ex)
         {

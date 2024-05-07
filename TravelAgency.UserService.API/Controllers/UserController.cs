@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TravelAgency.UserService.Application.Authentication.Commands.ChangeEmail;
-using TravelAgency.UserService.Application.Authentication.Commands.ChangeUserAttributes;
 using TravelAgency.UserService.Application.Authentication.Commands.ConfirmChangeEmail;
 using TravelAgency.UserService.Application.User.Commands.ConfirmUserCreation;
 using TravelAgency.UserService.Application.User.Commands.CreateClientAccount;
@@ -40,15 +39,15 @@ public class UserController : Controller
     }
 
     [HttpPost("confirm-user-creation")]
-    public async Task<IResult> ConfirmUserCreationAsync([FromBody]ConfirmUserCreationCommand command)
+    public async Task<IResult> ConfirmUserCreationAsync([FromBody] ConfirmUserCreationCommand command)
     {
         var result = await _sender.Send(command);
 
-        return result.GetResult();  
+        return result.GetResult();
     }
 
     [HttpGet]
-    public async Task<IResult> GetAsync([FromQuery]string id)
+    public async Task<IResult> GetAsync([FromQuery] string id)
     {
         var result = await _sender.Send(new GetUserQuery(id));
 
@@ -65,7 +64,7 @@ public class UserController : Controller
     }
 
     [HttpDelete]
-    public async Task<IResult> DeleteAsync([FromQuery]string id)
+    public async Task<IResult> DeleteAsync([FromQuery] string id)
     {
         var result = await _sender.Send(new DeleteUserCommand(id));
 
@@ -82,14 +81,6 @@ public class UserController : Controller
 
     [HttpPost("confirm-change-email")]
     public async Task<IResult> ConfirmChangeEmailAsync([FromBody] ConfirmChangeEmailCommand command)
-    {
-        var result = await _sender.Send(command);
-
-        return result.GetResult();
-    }
-
-    [HttpPut("change-user-data")]
-    public async Task<IResult> ChangeUserAttributesAsync([FromBody]ChangeUserAttributesCommand command)
     {
         var result = await _sender.Send(command);
 
