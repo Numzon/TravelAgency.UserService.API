@@ -1,6 +1,8 @@
 using Serilog;
 using System.Reflection;
 using TravelAgency.SharedLibrary.Swagger;
+using TravelAgency.SharedLibrary.Vault;
+using TravelAgency.SharedLibrary.Vault.Consts;
 using TravelAgency.UserService.API;
 using TravelAgency.UserService.Application;
 using TravelAgency.UserService.Infrastructure;
@@ -9,12 +11,30 @@ using TravelAgency.UserService.Infrastructure.Persistance;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 
 if (builder.Environment.IsProduction())
 {
-    builder.Configuration.AddJsonFile("secrets/appsettings.Production.json", optional: true);
+    var vaultBuilder = new VaultFacadeBuilder();
+
+    var vaultFacade = vaultBuilder
+                        .SetToken(Environment.GetEnvironmentVariable(VaultEnvironmentVariables.Token))
+                        .SetPort(Environment.GetEnvironmentVariable(VaultEnvironmentVariables.Port))
+                        .SetHost(Environment.GetEnvironmentVariable(VaultEnvironmentVariables.Host))
+                        .SetSSL(false)
+                        .Build();
+
+    var rabbitMq = await vaultFacade.ReadRabbitMqSecretAsync();
+    var connectionString = await vaultFacade.ReadUserServiceConnectionStringSecretAsync();
+    var cognito = await vaultFacade.ReadCognitoSecretAsync();
+    var ses = await vaultFacade.ReadSESSecretAsync();
+    var sns = await vaultFacade.ReadSNSSecretAsync();
+
+    builder.Configuration.AddInMemoryCollection(rabbitMq);
+    builder.Configuration.AddInMemoryCollection(connectionString);
+    builder.Configuration.AddInMemoryCollection(cognito);
+    builder.Configuration.AddInMemoryCollection(ses);
+    builder.Configuration.AddInMemoryCollection(sns);
 }
 
 builder.Services.AddApplicationServices();
